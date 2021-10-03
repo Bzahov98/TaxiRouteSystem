@@ -8,33 +8,33 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug"/>
+				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug"/>
+				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="TaxiRouteSystem_CourseWork_">
-				<Option output="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/TaxiRouteSystem_CourseWork_" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug"/>
+				<Option output="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/TaxiRouteSystem_CourseWork_" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/."/>
+					<Add directory="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/."/>
 					<Add directory="/usr/include/c++/7"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
 					<Add directory="/usr/include/c++/7/backward"/>
@@ -45,20 +45,20 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 TaxiRouteSystem_CourseWork_"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 TaxiRouteSystem_CourseWork_"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="TaxiRouteSystem_CourseWork_/fast">
-				<Option output="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/TaxiRouteSystem_CourseWork_" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug"/>
+				<Option output="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/TaxiRouteSystem_CourseWork_" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/."/>
+					<Add directory="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/."/>
 					<Add directory="/usr/include/c++/7"/>
 					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
 					<Add directory="/usr/include/c++/7/backward"/>
@@ -69,39 +69,39 @@
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 TaxiRouteSystem_CourseWork_/fast"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 TaxiRouteSystem_CourseWork_/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug"/>
+				<Option working_dir="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming\ Languages(PE)\ C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/README.md">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/README.md">
 			<Option target="TaxiRouteSystem_CourseWork_"/>
 		</Unit>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/car_database.txt">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/car_database.txt">
 			<Option target="TaxiRouteSystem_CourseWork_"/>
 		</Unit>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/point_database.txt">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/point_database.txt">
 			<Option target="TaxiRouteSystem_CourseWork_"/>
 		</Unit>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/route_database.txt">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/route_database.txt">
 			<Option target="TaxiRouteSystem_CourseWork_"/>
 		</Unit>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/test.cpp">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/test.cpp">
 			<Option target="TaxiRouteSystem_CourseWork_"/>
 		</Unit>
-		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/CMakeLists.txt">
+		<Unit filename="/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

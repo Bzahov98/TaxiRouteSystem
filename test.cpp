@@ -38,10 +38,10 @@ static const char *const CAR_MENU_FUEL_PER_KM = "6. Add car's fuel per km usage"
 static const char *const CAR_MENU_SAVE_CAR = "7. Save current car specifications";
 
 static const char *const FILE_PATH_ROOT = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/car_database.txt";
-static const char *const FILE_PATH_CAR = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/car_database.txt";
-static const char *const FILE_PATH_POINT = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/point_database.txt";
-static const char *const FILE_PATH_ROUTE = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/route_database.txt";
-static const char *const FILE_PATH_TAXI = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/taxi_database.txt";
+static const char *const FILE_PATH_CAR = "car_database.txt";
+static const char *const FILE_PATH_POINT = "point_database.txt";
+static const char *const FILE_PATH_ROUTE = "route_database.txt";
+static const char *const FILE_PATH_TAXI = "taxi_database.txt";
 
 
 static const char *const REGEX_DESERIALIZATION_OF_DATA = "([,|>](\\w+)[:])";
@@ -86,7 +86,7 @@ public:
         return result;
     }
 
-    const char *what() const noexcept {
+    const char *what() const noexcept override {
         return getMessage().c_str();
     }
 };

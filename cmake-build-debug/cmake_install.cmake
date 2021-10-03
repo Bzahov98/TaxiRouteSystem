@@ -1,4 +1,4 @@
-# Install script for directory: /home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)
+# Install script for directory: /home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

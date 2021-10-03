@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/test.cpp" "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/cmake-build-debug/CMakeFiles/TaxiRouteSystem_CourseWork_.dir/test.cpp.o"
+  "/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/test.cpp" "/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/cmake-build-debug/CMakeFiles/TaxiRouteSystem_CourseWork_.dir/test.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

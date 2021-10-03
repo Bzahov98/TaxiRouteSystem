@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/test.cpp
+/home/bzahov/Documents/gitRepos/TU-University-Tasks/TaxiRouteSystem/test.cpp
 iostream
 -
 fstream
@@ -24,5 +24,7 @@ vector
 regex
 -
 functional
+-
+bits/stdc++.h
 -
 

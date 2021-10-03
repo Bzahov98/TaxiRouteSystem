@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TaxiRouteSystem_CourseWork_" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TaxiRouteSystem_CourseWork_" TARGET_NAME="TaxiRouteSystem_CourseWork_" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="TaxiRouteSystem_CourseWork_" RUN_TARGET_NAME="TaxiRouteSystem_CourseWork_">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
