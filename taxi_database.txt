@@ -1,0 +1,4 @@
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
