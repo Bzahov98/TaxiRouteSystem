@@ -1,0 +1,9 @@
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
