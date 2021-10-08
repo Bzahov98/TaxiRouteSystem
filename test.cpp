@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <exception>
+#include <utility>
 #include <vector>
 #include <regex>
 #include <functional>
@@ -37,6 +38,9 @@ static const char *const CAR_MENU_YEARS_OF_USE = "5. Add car's years of use";
 static const char *const CAR_MENU_FUEL_PER_KM = "6. Add car's fuel per km usage";
 static const char *const CAR_MENU_SAVE_CAR = "7. Save current car specifications";
 
+static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name";
+
+
 static const char *const FILE_PATH_ROOT = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/car_database.txt";
 static const char *const FILE_PATH_CAR = "car_database.txt";
 static const char *const FILE_PATH_POINT = "point_database.txt";
@@ -47,8 +51,10 @@ static const char *const FILE_PATH_DEBUG = "debug_database.txt";
 
 static const char *const REGEX_DESERIALIZATION_OF_DATA = "([,|>](\\w+)[:])";
 
-static const char *const SERIALIZATION_STR_DEFAULT = "NULL";
+static const char *const SERIALIZATION_STR_DEFAULT = "";
 
+static const string PREFIX_POINT = ">PointName";
+static const string PREFIX_CAR = ">CarName";
 static const string PREFIX_ROUTE = ">RouteName";
 static const string PREFIX_TAXI = ">TaxiName";
 
@@ -80,7 +86,7 @@ public:
     string generalInfo = "InvalidInputException in: ";
     string info;
 
-    InvalidInputException(const string &info) : info(info) {}
+    InvalidInputException(string info) : info(std::move(info)) {}
 
     string getMessage() const {
         string result = generalInfo + info;
@@ -96,7 +102,8 @@ public:
 //--------Declaration of Methods---------
 template<class T>
 static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &fileName, vector<T> &dataVector,
-                                                           void (*callback)(const string &, vector<T> &));
+                                                                  void (*callback)(const string &, vector<T> &));
+
 template<class T>
 static void extractDataFromLineIntoGenericsList(const string &lineOfData, list<T> &list);
 
@@ -110,15 +117,16 @@ template<class T>
 static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vector<T> &vectorWithData);
 
 static void extractDataFromLineIntoPointVector(const string &lineOfData, vector<Point> &pointsVector);
+
 static void extractDataFromLineIntoCarVector(const string &lineOfData, vector<Car> &carsVector);
 
 template<class T>
 static void listToString(list<T> list, string &result);
 
 template<class T>
-static void stringToList(const string& stringWithData, list<T> &);
+static void stringToList(const string &stringWithData, list<T> &);
 
-static string insertDelimiterAtBeginnig(string &b, const string& delimiter);
+static string insertDelimiterAtBeginnig(string &b, const string &delimiter);
 
 static void removeWhiteSpacesOfString(string &stringWithData);
 
@@ -134,11 +142,14 @@ static bool addNewCars();
 
 static void loadDataVectorsFromFiles();
 
-static vector<string> split(const string &str, const string& delimiter);
+static vector<string> split(const string &str, const string &delimiter);
 
 //---------------------
 
 void testTaxiFunctionality();
+
+template<class T>
+void extractNestedData(T dataObject, vector<string> &splitData);
 
 static vector<Car> carsVector;
 static vector<Route> routesVector;
@@ -168,7 +179,7 @@ public:
     }
 
     Car(const string &brand, const string &model, int yearsOfUse, int numSeats, double fuelPerKm,
-        const string& registrationNumber) {
+        const string &registrationNumber) {
         setBrand(brand);
         setModel(model);
         setYearsOfUse(yearsOfUse);
@@ -186,8 +197,8 @@ public:
         return brand;
     }
 
-    void setBrand(const string &brand) {
-        Car::brand = brand;
+    void setBrand(const string &newBrand) {
+        Car::brand = newBrand;
 
     }
 
@@ -195,32 +206,32 @@ public:
         return model;
     }
 
-    void setModel(const string &model) {
-        Car::model = model;
+    void setModel(const string &newModel) {
+        this->model = newModel;
     }
 
     int getYearsOfUse() const {
         return yearsOfUse;
     }
 
-    void setYearsOfUse(int yearsOfUse) {
-        Car::yearsOfUse = yearsOfUse;
+    void setYearsOfUse(int newYearsOfUse) {
+        Car::yearsOfUse = newYearsOfUse;
     }
 
     int getNumSeats() const {
         return numSeats;
     }
 
-    void setNumSeats(int numSeats) {
-        Car::numSeats = numSeats;
+    void setNumSeats(int newNumSeats) {
+        Car::numSeats = newNumSeats;
     }
 
     double getFuelPerKm() const {
         return fuelPerKm;
     }
 
-    void setFuelPerKm(double fuelPerKm) {
-        Car::fuelPerKm = fuelPerKm;
+    void setFuelPerKm(double newFuelPerKm) {
+        Car::fuelPerKm = newFuelPerKm;
     }
 
     virtual void print();
@@ -256,7 +267,7 @@ public:
 
 string Car::toString() const {
     string result =
-            ">regNum: " + getRegistrationNumber() +
+            PREFIX_CAR + ": " + getRegistrationNumber() +
             ",brand: " + getBrand() +
             ",model: " + getModel() +
             ",seats: " + to_string(getNumSeats()) +
@@ -346,7 +357,7 @@ public:
         setName(SERIALIZATION_STR_DEFAULT);
     }
 
-    Point(const string& name, double xx, double yy) {
+    Point(const string &name, double xx, double yy) {
         setXY(xx, yy);
         setName(name);
     }
@@ -406,6 +417,8 @@ public:
     void saveToFile(string filename) override;
 
     void isObjectInFileDatabase(string filename, string parameter) override;
+
+    bool isEmpty();
 };
 
 const string &Point::getName() const {
@@ -427,7 +440,7 @@ void Point::print() {
 }
 
 string Point::toString() const {
-    return ">name:" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
+    return PREFIX_POINT + ":" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
 }
 
 void Point::saveToFile(string filename) {
@@ -442,6 +455,9 @@ void Point::isObjectInFileDatabase(string filename, string parameter) {
     cerr << "reading point's info: (NOT IMPLEMENTED)" << Point::toString() << " from file";
 }
 
+bool Point::isEmpty() {
+    return name.empty() && x == 0 && y == 0;
+}
 
 
 //------------
@@ -452,7 +468,11 @@ private:
     int dailyRepeat;
     list<Point> routePointsList;
 public:
-    Route() {}
+    Route() {
+        name = "";
+        distance = 0;
+        dailyRepeat = 0;
+    }
 
     Route(const string &name, double distance, int dailyRepeat) {
         setName(name);
@@ -462,7 +482,7 @@ public:
 
     const list<Point> &getRoutePointsList() const;
 
-    void setRoutePointsList(const list<Point> &routePointsList);
+    void setRoutePointsList(const list<Point> &newRoutePointsList);
 
     const string &getName() const {
         return name;
@@ -484,11 +504,11 @@ public:
         return dailyRepeat;
     }
 
-    void setDailyRepeat(int dailyRepeat) {
-        Route::dailyRepeat = dailyRepeat;
+    void setDailyRepeat(int newDailyRepeat) {
+        Route::dailyRepeat = newDailyRepeat;
     }
 
-    void addNewRoutePoint(Point p) ;
+    void addNewRoutePoint(Point p);
 
     string toString() const;
 
@@ -507,11 +527,16 @@ public:
         is >> route.name;
         is >> route.distance;
         is >> route.dailyRepeat;
-        string strOfPointsData;
-        /*is >> strOfPointsData;
-        list<Point> pointList;
-        stringToList(strOfPointsData, pointList);
-        route.setRoutePointsList(pointList);*/
+        // add inner points data
+        do {
+            Point point;
+            is >> point;
+            cerr << endl << point.toString() << endl;
+            if (point.isEmpty()) {
+                break;
+            }
+            route.addNewRoutePoint(point);
+        } while (true);
         return is;
     }
 };
@@ -526,7 +551,7 @@ void Route::addNewRoutePoint(Point p) {
 string Route::toString() const {
     string pointsStr;
     listToString(routePointsList, pointsStr);
-    return ">RouteName:" + name + ",distance: " + to_string(distance) + ",dailyRepeat: " +
+    return PREFIX_ROUTE + ":" + name + ",distance: " + to_string(distance) + ",dailyRepeat: " +
            to_string(dailyRepeat) + "" + pointsStr;
 }
 
@@ -552,30 +577,34 @@ const list<Point> &Route::getRoutePointsList() const {
     return routePointsList;
 }
 
-void Route::setRoutePointsList(const list<Point> &routePointsList) {
-    Route::routePointsList = routePointsList;
+void Route::setRoutePointsList(const list<Point> &newRoutePointsList) {
+    routePointsList = newRoutePointsList;
 }
 
 // -----------
 class Taxi : public Car {
 protected:
-    Route currentRoute;
     string driverName;
+    Route currentRoute;
 public:
     Taxi() : Car() {}
 
-    Taxi(const string &brand, const string &model, int yearsOfUse,
-         int numSeats, double fuelPerKm, const string &driverName, const string regNum)
+    Taxi(const string &newDriverName, const string &brand, const string &model, int yearsOfUse,
+         int numSeats, double fuelPerKm, const string &driverName, const string &regNum)
             : Car(brand, model, yearsOfUse, numSeats, fuelPerKm, regNum) {
-
+        setDriverName(newDriverName);
     }
 
-    Taxi(Car car) : Car(car.getBrand(), car.getModel(), car.getYearsOfUse(), car.getNumSeats(), car.getFuelPerKm(),
-                        car.getRegistrationNumber()) {}
+    Taxi(const string &newDriverName, const Car &car) : Car(car.getBrand(), car.getModel(), car.getYearsOfUse(),
+                                                            car.getNumSeats(), car.getFuelPerKm(),
+                                                            car.getRegistrationNumber()) {
+        setDriverName(newDriverName);
+    }
 
-    Taxi(const Car car, const Route route)
+    Taxi(const string &newDriverName, const Car& car, const Route &route)
             : Car(car.getBrand(), car.getModel(), car.getYearsOfUse(), car.getNumSeats(), car.getFuelPerKm(),
                   car.getRegistrationNumber()) {
+        setDriverName(newDriverName);
         setCurrentRoute(route);
     }
 
@@ -605,9 +634,33 @@ public:
 
     void isObjectInFileDatabase(string str, string regNum) override;
 
-    void addNewRoutePoint(Point p);
+    void addNewRoutePoint(const Point &p);
+
+    void addNewCarInfo(const Car &car);
+
+    friend ostream &operator<<(ostream &os, const Taxi &taxi);
+
+    friend istream &operator>>(istream &is, Taxi &taxi);
 };
 
+ostream &operator<<(ostream &os, const Taxi &taxi) {
+    os << taxi.toString() << endl;
+    return os;
+}
+
+istream &operator>>(istream &is, Taxi &taxi) {
+//       (Car) taxi;
+    is >> taxi.driverName;
+    Car car;
+    Route route;
+//        cout << TAXI_MENU_ADD_DRIVER_NAME;
+    is >> car;
+    is >> route;
+    taxi.addNewCarInfo(car);
+    taxi.setCurrentRoute(route);
+
+    return is;
+}
 
 void Taxi::print() {
     cout << "Taxi info: \n" + this->toString() << endl;
@@ -619,25 +672,34 @@ double Taxi::calculatePerDayFuelUse() {
 }
 
 string Taxi::toString() const {
-        return ">"+Car::toString().append(currentRoute.toString());
+    return PREFIX_TAXI + ":" + driverName + Car::toString().append(currentRoute.toString());
 }
 
 void Taxi::saveToFile(string fileName) {
     cout << "saving taxi: " << Taxi::toString() << " to file:";
     std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-    ofs << Taxi::toString() <<endl;
+    ofs << Taxi::toString() << endl;
     ofs.close();
 }
 
 void Taxi::isObjectInFileDatabase(string filename, string regNum) {
     vector<Taxi> &resultVector();
-   // getAndIterateEachLineOfFileWithCallbackSaveIntoVector(filename, resultVector,)
+    // getAndIterateEachLineOfFileWithCallbackSaveIntoVector(filename, resultVector,)
 }
 
-void Taxi::addNewRoutePoint(Point p) {
+void Taxi::addNewRoutePoint(const Point &p) {
     if (Point::isValid(p)) {
         this->getCurrentRoute().addNewRoutePoint(p);
     } else cerr << "addNewRoutePoint -> Point is invalid" << endl; // TODO
+}
+
+void Taxi::addNewCarInfo(const Car &car) {
+    this->setModel(car.getModel());
+    this->setBrand(car.getBrand());
+    this->setRegistrationNumber(car.getRegistrationNumber());
+    this->setNumSeats(car.getNumSeats());
+    this->setFuelPerKm(car.getFuelPerKm());
+    this->setYearsOfUse(car.getYearsOfUse());
 }
 
 // --------Implementation of static methods--------------------
@@ -781,15 +843,13 @@ static void clientMenu() throw(InvalidInputException) {
 
 }
 
-
-
 /*
  * It will iterate through all the lines in file and
  * call the given callback on each line.
  */
 template<class T>
 static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &fileName, vector<T> &dataVector,
-                                                           void (*callback)(const string &, vector<T> &)
+                                                                  void (*callback)(const string &, vector<T> &)
 ) {// Open the File
     ifstream in(fileName.c_str());
     if (!in) {
@@ -809,9 +869,8 @@ static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &
 }
 
 
-
 template<class T>
-static bool getAndPutFileContentIntoGenericsVector(const string &fileName, vector<T> &vector) {
+static bool getAndPutFileContentIntoGenericsVector(const string &fileName, vector <T> &vector) {
     // Open the File
     ifstream in(fileName.c_str());
 
@@ -877,47 +936,52 @@ void extractDataFromLineIntoPointVector(const string &lineOfData, vector<Point> 
 
 template<class T>
 static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vector<T> &vectorWithData) {
-    
-    T dataObject;
-    cerr << endl<< "Deserialized: " << typeid(T).name() << endl;
-    //string test = ">name:route1,distance: 21.000000,dailyRepeat: 1|>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000>name:d,X: 1.000000,Y: 1.000000";//|>Car: bla,asd:sad> sadasd asd>sadasd";
-    const string& copyOfLineOfData = lineOfData;
-    //vector < string > a = split(copyOfLineOfData, "|");
-    vector<string> splitData = split(copyOfLineOfData, DELIMITER_START_LINE);
-    //list<Point> pointList = dataObject.getRoutePointsList();
-    if (splitData.size() > 1) {
-       // if (lineOfData.substr(0,PREFIX_ROUTE.size()) == PREFIX_ROUTE) {
-            for (int i = 1; i < splitData.size(); i++) {
-                Point newPoint;
-                string pointDataStr = insertDelimiterAtBeginnig(splitData.at(i), DELIMITER_START_LINE);
-                deserializeStrData(pointDataStr);
-                extractDataFromLineIntoGenericsObj(pointDataStr, newPoint);
-                //if (dataObject type == T type)
-                dataObject.addNewRoutePoint(newPoint);
-            }
-       // }else if (lineOfData.substr(0,PREFIX_TAXI.size()) == PREFIX_TAXI) {
-            /*for (int i = 1; i < splitData.size(); i++) {
-                Point newPoint;
-                string pointDataStr = splitData.at(i);
-                deserializeStrData(pointDataStr);
-                extractDataFromLineIntoGenericsList(pointDataStr, pointList);
-                //dataObject.addNewRoutePoint(newPoint);
-            }*/
-       // }
-    } else cerr << "?" << endl;
-    string routeBasicInfo = insertDelimiterAtBeginnig(splitData.at(0), DELIMITER_START_LINE);
-    deserializeStrData(routeBasicInfo);
-    stringstream streamWithObjectData(routeBasicInfo);
-
-    streamWithObjectData >> dataObject;
-    vectorWithData.push_back(dataObject);
-    dataObject.saveToFile(FILE_PATH_DEBUG);
-
-    cerr << endl << "Final: "<< dataObject.toString()<< endl; // DEBUG
+//
+//    T dataObject;
+//    cerr << endl << "Deserialized: " << typeid(T).name() << endl;
+//    //string test = ">name:route1,distance: 21.000000,dailyRepeat: 1|>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000>name:d,X: 1.000000,Y: 1.000000";//|>Car: bla,asd:sad> sadasd asd>sadasd";
+//    const string &copyOfLineOfData = lineOfData;
+//    //vector < string > a = split(copyOfLineOfData, "|");
+//    vector<string> splitData = split(copyOfLineOfData, DELIMITER_START_LINE);
+//    //list<Point> pointList = dataObject.getRoutePointsList();
+//
+//    string prefixTag = lineOfData.substr(0,PREFIX_ROUTE.size());
+//
+//    if (splitData.size() > 1) {
+//        // if (lineOfData.substr(0,PREFIX_ROUTE.size()) == PREFIX_ROUTE) {
+//        for (int i = 1; i < splitData.size(); i++) {
+//            vector<string> splitDataW = split(splitData[0], ":");
+//
+//            newPoint;
+//            string pointDataStr = insertDelimiterAtBeginnig(splitData.at(i), DELIMITER_START_LINE);
+//            deserializeStrData(pointDataStr);
+//            extractDataFromLineIntoGenericsObj(pointDataStr, newPoint);
+//            //if (dataObject type == T type)
+//            dataObject.addNewRoutePoint(newPoint);
+//        }
+    // }else if (lineOfData.substr(0,PREFIX_TAXI.size()) == PREFIX_TAXI) {
+    /*for (int i = 1; i < splitData.size(); i++) {
+        Point newPoint;
+        string pointDataStr = splitData.at(i);
+        deserializeStrData(pointDataStr);
+        extractDataFromLineIntoGenericsList(pointDataStr, pointList);
+        //dataObject.addNewRoutePoint(newPoint);
+    }*/
+    // }
+//    } else cerr << endl << "?" << endl;
+//    string routeBasicInfo = insertDelimiterAtBeginnig(splitData.at(0), DELIMITER_START_LINE);
+//    deserializeStrData(routeBasicInfo);
+//    stringstream streamWithObjectData(routeBasicInfo);
+//
+//    streamWithObjectData >> dataObject;
+//    vectorWithData.push_back(dataObject);
+//    dataObject.saveToFile(FILE_PATH_DEBUG);
+//
+//    cerr << endl << "Final: " << dataObject.toString() << endl; // DEBUG
 
 }
 
-static string insertDelimiterAtBeginnig(string &b, const string& delimiter) { return b.insert(0, delimiter); }
+static string insertDelimiterAtBeginnig(string &b, const string &delimiter) { return b.insert(0, delimiter); }
 
 template<class T>
 static void extractDataFromLineIntoGenericsList(const string &lineOfData, list <T> &list) {
@@ -933,7 +997,7 @@ static void extractDataFromLineIntoGenericsList(const string &lineOfData, list <
     streamWithObjectData >> dataObject;
     list.push_back(dataObject);
 
-    cerr << "GenericsList - after saved  "<<typeid(T).name()<<"  -> " << dataObject.toString() << endl; // DEBUG
+    cerr << "GenericsList - after saved  " << typeid(T).name() << "  -> " << dataObject.toString() << endl; // DEBUG
     streamWithObjectData.clear();
 }
 
@@ -950,13 +1014,14 @@ static void extractDataFromLineIntoGenericsObj(const string &lineOfData, T &data
     streamWithObjectData >> dataObject;
     //list.push_back(dataObject);
 
-    cerr << endl<< "GenericsObj - after saved  "<<typeid(T).name()<<"  -> " << dataObject.toString() << endl; // DEBUG
+    cerr << endl << "GenericsObj - after saved  " << typeid(T).name() << "  -> " << dataObject.toString()
+         << endl; // DEBUG
     streamWithObjectData.clear();
 }
 
 template<class T>
 static void listToString(list<T> list, string &result) {
-    for (T& t: list) {
+    for (T &t: list) {
         result.append(t.toString());
     }
     //result.pop_back();
@@ -982,7 +1047,7 @@ static void deserializeStrData(string &stringWithData) {
     //cerr << stringWithData;
 }
 
-static vector<string> split(const string &str, const string& delimiter) {
+static vector<string> split(const string &str, const string &delimiter) {
     vector<string> tokens;
     size_t prev = 0, pos = 0;
     do {
@@ -996,16 +1061,17 @@ static vector<string> split(const string &str, const string& delimiter) {
 }
 
 template<class T>
-static void stringToList(const string& stringWithData, list<T> &listOfData) {
+static void stringToList(const string &stringWithData, list<T> &listOfData) {
 
     vector<string> vs = split(stringWithData, DELIMITER_START_LINE);
-    for (string s : vs) {
+    for (const string &s : vs) {
         cerr << endl << "stringToList(single object): " << s << endl;
         extractDataFromLineIntoGenericsList(s, listOfData);
     }
 }
 
-static void loadDataVectorsFromFiles(/*vector<Car> carsVector,vector<Point> pointVector,vector<Route> routesVector,vector<Taxi> taxiVector*/) {
+static void
+loadDataVectorsFromFiles(/*vector<Car> carsVector,vector<Point> pointVector,vector<Route> routesVector,vector<Taxi> taxiVector*/) {
 //   getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_CAR, carsVector,
 //                                                         extractDataFromLineIntoGenericsVector);
 //    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_POINT, pointVector,
@@ -1015,7 +1081,32 @@ static void loadDataVectorsFromFiles(/*vector<Car> carsVector,vector<Point> poin
 //    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_TAXI , taxiVector  , extractDataFromLineIntoGenericsVector);
 }
 
-void testRouteFunctionality(){
+void testExtractFunct() {
+    string testLine;
+    Point point;
+    Point p1("aa", 1, 2);
+    Point p2("bb", 2, 3);
+
+    extractDataFromLineIntoGenericsObj(p1.toString(), point);
+    // Car
+    Car car;
+    Car c1("newBrand1", "newModel1", 10, 20, 30, "CB1234CB");
+    extractDataFromLineIntoGenericsObj(c1.toString(), car);
+    // Route
+    Route route;
+    Route r("route69", 69, 2);
+    r.addNewRoutePoint(p1);
+    r.addNewRoutePoint(p2);
+
+    extractDataFromLineIntoGenericsObj(r.toString(), route);
+    // Taxi
+    Taxi t;
+    Taxi taxi1("Gosh", c1, r);
+    extractDataFromLineIntoGenericsObj(taxi1.toString(), t);
+
+}
+
+void testRouteFunctionality() {
 
     Point p1("a", 1, 2);
     Point p2("b", 3, 4);
@@ -1058,26 +1149,30 @@ void testTaxiFunctionality() {
     list<Point> p;
     Point p1("a", 1, 2);
     Point p2("b", 3, 4);
+    Point p3("c", 5, 6);
     Route r("route1", 21, 1);
     r.addNewRoutePoint(p1);
     r.addNewRoutePoint(p2);
     //const string &brand, const string &model, int yearsOfUse, int numSeats, double fuelPerKm,string registrationNumber) {
-    Car c1("myBrand1","myModel1",1,2,3,"CA1234CA");
-    Car c2("myBrand2","myModel2",4,5,6,"CB5678CB");
+    Car c1("myBrand1", "myModel1", 1, 2, 3, "CA1234CA");
+    Car c2("myBrand2", "myModel2", 4, 5, 6, "CB5678CB");
 
-    Taxi taxi1(c1,r);
-//    taxi1.saveToFile(FILE_PATH_TAXI);
+    Taxi taxi1("Pesho", c1, r);
 
-    taxi1.isObjectInFileDatabase(FILE_PATH_TAXI, "");
+    taxi1.addNewRoutePoint(p3);
+    //taxi1.saveToFile(FILE_PATH_TAXI);
 
-    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_TAXI , taxiVector  , extractDataFromLineIntoGenericsVector);
+    //taxi1.isObjectInFileDatabase(FILE_PATH_TAXI, "");
 
+    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_TAXI, taxiVector,
+                                                          extractDataFromLineIntoGenericsVector);
 //    cout << "---result----\n";
 //    routesVector.back().print();
     cout << "\n--- correct result----\n";
     taxi1.print();
 
 }
+
 ////Debug
 //template<class T>
 //void bla(T clas){
@@ -1085,6 +1180,7 @@ void testTaxiFunctionality() {
 //
 //}
 int main(int argc, const char **argv) {
+    testExtractFunct();
 
     // adminMenu();
     //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
@@ -1092,7 +1188,8 @@ int main(int argc, const char **argv) {
 //    Taxi taxi;
 //    bla(taxi);
 //    testRouteFunctionality();
-    testTaxiFunctionality();
+    //testTaxiFunctionality();
+
 
 //    if (result) {
 //        // Print the vector contents

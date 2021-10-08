@@ -1,9 +1,1 @@
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
->>regNum: CA1234CA,brand: myBrand1,model: myModel1,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:,distance: 0.000000,dailyRepeat: 0
+>TaxiName:Pesho>CarName: NULL,brand: NULL,model: NULL,seats: 0,fuelPerKm: 0.000000,yearsOfUse:0>RouteName:,distance: 0.000000,dailyRepeat: 0
