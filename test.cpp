@@ -48,7 +48,6 @@ static const char *const FILE_PATH_ROUTE = "route_database.txt";
 static const char *const FILE_PATH_TAXI = "taxi_database.txt";
 static const char *const FILE_PATH_DEBUG = "debug_database.txt";
 
-
 static const char *const REGEX_DESERIALIZATION_OF_DATA = "([,|>](\\w+)[:])";
 
 static const char *const SERIALIZATION_STR_DEFAULT = "";
@@ -57,25 +56,19 @@ static const string PREFIX_POINT = ">PointName";
 static const string PREFIX_CAR = ">CarName";
 static const string PREFIX_ROUTE = ">RouteName";
 static const string PREFIX_TAXI = ">TaxiName";
+static const bool DEBUG = true;
 
 static const char *const DELIMITER_START_LINE = ">";
 
 // ---Class declarations--------------
 
-class Serializable {
-public:
-    virtual void saveToFile(string filename) = 0;
-
-    virtual void isObjectInFileDatabase(string filename, string parameter) = 0;
-
-    //TODO: add toString() and print() to class
-};
+class Serializable;
 
 class InvalidInputException;
 
-class Car;
-
 class Point;
+
+class Car;
 
 class Taxi;
 
@@ -86,7 +79,7 @@ public:
     string generalInfo = "InvalidInputException in: ";
     string info;
 
-    InvalidInputException(string info) : info(std::move(info)) {}
+    explicit InvalidInputException(string info) : info(std::move(info)) {}
 
     string getMessage() const {
         string result = generalInfo + info;
@@ -149,7 +142,7 @@ static vector<string> split(const string &str, const string &delimiter);
 void testTaxiFunctionality();
 
 template<class T>
-void extractNestedData(T dataObject, vector<string> &splitData);
+bool isItemExistInVector(basic_string<char> identificationName, const vector<T> &dataVector);
 
 static vector<Car> carsVector;
 static vector<Route> routesVector;
@@ -157,7 +150,142 @@ static vector<Taxi> taxiVector;
 static vector<Point> pointVector;
 
 //********
+class Serializable {
+public:
+    virtual void saveToFile(string fileName) = 0;
 
+    virtual bool isObjectInFileDatabase(string filename) = 0;
+
+    virtual string getIdentification() const = 0;
+
+    virtual string toString() const = 0;
+
+    virtual void print() = 0;
+};
+
+//-------------
+
+class Point : Serializable {
+private:
+    string name;
+    double x{};
+    double y{};
+public:
+    Point() {
+        setXY(0, 0);
+        setName(SERIALIZATION_STR_DEFAULT);
+    }
+
+    Point(const string &name, double xx, double yy) {
+        setXY(xx, yy);
+        setName(name);
+    }
+
+    Point(double x, double y) : x(x), y(y) {}
+
+    virtual ~Point() {
+        setXY(0, 0);
+    }
+
+    double getX() const {
+        return x;
+    }
+
+    void setX(double newX) throw() {
+        if (newX >= 0) {
+            Point::x = newX;
+        } else throw InvalidInputException("Point -> setX");
+    }
+
+    double getY() const {
+        return y;
+    }
+
+    void setY(double y) {
+        Point::y = y;
+    }
+
+    const string &getName() const;
+
+    void setName(const string &newName);
+
+    void setXY(const double a, const double b) {
+        x = a;
+        y = b;
+    };
+
+    static bool isValid(const Point &p);
+
+    void print() override;
+
+    string toString() const;
+
+    friend ostream &operator<<(ostream &os, const Point &point) {
+        os << point.toString();
+        return os;
+    }
+
+    friend istream &operator>>(istream &is, Point &point) {
+        is >> point.name;
+        is >> point.x;
+        is >> point.y;
+        return is;
+    }
+
+public:
+    void saveToFile(string fileName) override;
+
+    bool isObjectInFileDatabase(string parameter) override;
+
+    bool isEmpty();
+
+    string getIdentification() const override;
+};
+
+string Point::getIdentification() const {
+    return getName();
+}
+
+const string &Point::getName() const {
+    return name;
+}
+
+void Point::setName(const string &newName) {
+    Point::name = newName;
+}
+
+bool Point::isValid(const Point &p) {
+    return p.getX()>0 && p.getY()>0;
+    //return true;
+}
+
+void Point::print() {
+    cout << toString();
+}
+
+string Point::toString() const {
+    return PREFIX_POINT + ":" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
+}
+
+void Point::saveToFile(string fileName) {
+    if (!isObjectInFileDatabase(fileName)) {
+        cout << "saving Point: " << Point::toString() << " to file: " << fileName << endl;;
+        std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+        ofs << this->toString();
+        ofs.close();
+    } else {
+        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+    }
+}
+
+bool Point::isObjectInFileDatabase(string filename) {
+    // TODO: make one more check inside file database
+    return isItemExistInVector(getIdentification(), pointVector);
+}
+
+bool Point::isEmpty() {
+    return name.empty() && x == 0 && y == 0;
+}
 
 // ---------
 class Car : Serializable {
@@ -192,11 +320,11 @@ public:
 
     void setRegistrationNumber(const string &regNumber) throw(InvalidInputException);
 
-    // TODO: make input check
     const string &getBrand() const {
         return brand;
     }
 
+    // TODO: make input check
     void setBrand(const string &newBrand) {
         Car::brand = newBrand;
 
@@ -234,13 +362,13 @@ public:
         Car::fuelPerKm = newFuelPerKm;
     }
 
-    virtual void print();
+    void print() override;
 
     virtual string toString() const;
 
     virtual void saveToFile(string str);
 
-    virtual void isObjectInFileDatabase(string str, string regNum);
+    virtual bool isObjectInFileDatabase(string filename);
 
     static std::vector<Car> readAllFromFile(string str);
 
@@ -263,7 +391,13 @@ public:
         is >> car.yearsOfUse;
         return is;
     }
+
+    string getIdentification() const override;
 };
+
+string Car::getIdentification() const {
+    return registrationNumber;
+}
 
 string Car::toString() const {
     string result =
@@ -290,19 +424,22 @@ void Car::setRegistrationNumber(const string &regNum) throw(InvalidInputExceptio
     } else throw InvalidInputException("Wrong registration Number");
 }
 
-void Car::saveToFile(const string fileName) {
-    cout << "saving car: " << Car::toString() << " to file";
-    std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-    ofs << this->toString();
-    ofs.close();
+void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
+    if (!isObjectInFileDatabase(fileName)) {
+
+        cout << "saving car: " << Car::toString() << " to file: " << fileName << endl;;
+        std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+        ofs << this->toString();
+        ofs.close();
+    } else {
+        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+    }
 }
 
-void Car::isObjectInFileDatabase(string str, string regNum) {
-    cerr << "reading car's info: (NOT IMPLEMENTED)" << Car::toString() << " from file";
-    // TODO:
-    //ifs.close();
+bool Car::isObjectInFileDatabase(string str) {
+    // TODO: make one more check inside file database
+    return isItemExistInVector(getIdentification(), carsVector);
 }
-
 
 std::vector<Car> Car::readAllFromFile(string str) {
     std::vector<Car> result;
@@ -340,123 +477,6 @@ std::vector<Car> Car::readAllFromFile(string str) {
         // process pair (a,b)
     }
     return result;
-}
-
-
-
-//-------------
-
-class Point : Serializable {
-private:
-    string name;
-    double x{};
-    double y{};
-public:
-    Point() {
-        setXY(0, 0);
-        setName(SERIALIZATION_STR_DEFAULT);
-    }
-
-    Point(const string &name, double xx, double yy) {
-        setXY(xx, yy);
-        setName(name);
-    }
-
-    Point(double x, double y) : x(x), y(y) {}
-
-    virtual ~Point() {
-        setXY(0, 0);
-    }
-
-    double getX() const {
-        return x;
-    }
-
-    void setX(double x) throw() {
-        if (x >= 0) {
-            Point::x = x;
-        } else throw InvalidInputException("Point -> setX");
-    }
-
-    double getY() const {
-        return y;
-    }
-
-    void setY(double y) {
-        Point::y = y;
-    }
-
-    const string &getName() const;
-
-    void setName(const string &name);
-
-    void setXY(const int a, const int b) {
-        x = a;
-        y = b;
-    };
-
-    static bool isValid(const Point &p);
-
-    void print();
-
-    string toString() const;
-
-    friend ostream &operator<<(ostream &os, const Point &point) {
-        os << point.toString();
-        return os;
-    }
-
-    friend istream &operator>>(istream &is, Point &point) {
-        is >> point.name;
-        is >> point.x;
-        is >> point.y;
-        return is;
-    }
-
-public:
-    void saveToFile(string filename) override;
-
-    void isObjectInFileDatabase(string filename, string parameter) override;
-
-    bool isEmpty();
-};
-
-const string &Point::getName() const {
-    return name;
-}
-
-void Point::setName(const string &name2) { // promenih go
-    Point::name = name2;
-}
-
-bool Point::isValid(const Point &p) {
-    // TODO: implement if needed
-    //return p.getX()>0 && p.getY()>0;
-    return true;
-}
-
-void Point::print() {
-    cout << toString();
-}
-
-string Point::toString() const {
-    return PREFIX_POINT + ":" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
-}
-
-void Point::saveToFile(string filename) {
-    cout << "saving Point: " << Point::toString() << " to file";
-    std::ofstream ofs(filename, fstream::in | fstream::out | fstream::app);
-    ofs << this->toString();
-    ofs.close();
-}
-
-void Point::isObjectInFileDatabase(string filename, string parameter) {
-    // TODO:
-    cerr << "reading point's info: (NOT IMPLEMENTED)" << Point::toString() << " from file";
-}
-
-bool Point::isEmpty() {
-    return name.empty() && x == 0 && y == 0;
 }
 
 
@@ -512,11 +532,11 @@ public:
 
     string toString() const;
 
-    void print();
+    void print() override;
 
-    void saveToFile(string filename) override;
+    void saveToFile(string fileName) override;
 
-    void isObjectInFileDatabase(string filename, string parameter) override;
+    bool isObjectInFileDatabase(string filename) override;
 
     friend ostream &operator<<(ostream &os, const Route &route) {
         os << route.toString();
@@ -539,13 +559,22 @@ public:
         } while (true);
         return is;
     }
+
+    double calcRouteTotalDistance() const {
+        return dailyRepeat * distance;
+    }
+
+    string getIdentification() const override;
 };
 
+string Route::getIdentification() const {
+    return name;
+}
 
 void Route::addNewRoutePoint(Point p) {
     if (Point::isValid(p)) {
         routePointsList.push_back(p);
-    } else cerr << "addNewRoutePoint -> Point is invalid" << endl; // TODO
+    } else cerr << "addNewRoutePoint -> Point is invalid" << endl;
 }
 
 string Route::toString() const {
@@ -559,18 +588,20 @@ void Route::print() {
     cout << Route::toString();
 }
 
-void Route::saveToFile(string filename) {
-    cout << "saving Route: " << Route::toString() << " to file";
-    std::ofstream ofs(filename, fstream::in | fstream::out | fstream::app);
-    ofs << this->toString() << endl;
-    ofs.close();
-
+void Route::saveToFile(string fileName = FILE_PATH_ROUTE) {
+    if (!isObjectInFileDatabase(fileName)) {
+        cout << "saving Route: " << Route::toString() << " to file: " << fileName << endl;
+        std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+        ofs << this->toString() << endl;
+        ofs.close();
+    } else {
+        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+    }
 }
 
-void Route::isObjectInFileDatabase(string filename, string parameter) {
-    // TODO
-    cerr << "reading Route's info: (NOT IMPLEMENTED)" << Route::toString() << " from file";
-
+bool Route::isObjectInFileDatabase(string filename) {
+    // TODO: make one more check inside file database
+    return isItemExistInVector(getIdentification(), routesVector);
 }
 
 const list<Point> &Route::getRoutePointsList() const {
@@ -601,7 +632,7 @@ public:
         setDriverName(newDriverName);
     }
 
-    Taxi(const string &newDriverName, const Car& car, const Route &route)
+    Taxi(const string &newDriverName, const Car &car, const Route &route)
             : Car(car.getBrand(), car.getModel(), car.getYearsOfUse(), car.getNumSeats(), car.getFuelPerKm(),
                   car.getRegistrationNumber()) {
         setDriverName(newDriverName);
@@ -624,15 +655,15 @@ public:
         Taxi::driverName = newDriverName;
     }
 
-    void print();
+    void print() override;
 
-    double calculatePerDayFuelUse();
+    double calculatePerDayFuelUse() const;
 
     string toString() const override;
 
-    void saveToFile(string filename) override;
+    void saveToFile(string fileName) override;
 
-    void isObjectInFileDatabase(string str, string regNum) override;
+    bool isObjectInFileDatabase(string filename) override;
 
     void addNewRoutePoint(const Point &p);
 
@@ -641,7 +672,13 @@ public:
     friend ostream &operator<<(ostream &os, const Taxi &taxi);
 
     friend istream &operator>>(istream &is, Taxi &taxi);
+
+    string getIdentification() const override;
 };
+
+string Taxi::getIdentification() const {
+    return driverName;
+}
 
 ostream &operator<<(ostream &os, const Taxi &taxi) {
     os << taxi.toString() << endl;
@@ -666,31 +703,36 @@ void Taxi::print() {
     cout << "Taxi info: \n" + this->toString() << endl;
 }
 
-double Taxi::calculatePerDayFuelUse() {
-    // TODO: да извежда информация колко гориво да се зареди за извършване нa дневната обиколка
-    return 0;
+double Taxi::calculatePerDayFuelUse() const {
+    //извежда информация колко гориво да се зареди за извършване нa дневната обиколка
+    // (repeats * distance) * fuelPerKM
+    return this->getCurrentRoute().calcRouteTotalDistance() * fuelPerKm;
 }
 
 string Taxi::toString() const {
     return PREFIX_TAXI + ":" + driverName + Car::toString().append(currentRoute.toString());
 }
 
-void Taxi::saveToFile(string fileName) {
-    cout << "saving taxi: " << Taxi::toString() << " to file:";
-    std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-    ofs << Taxi::toString() << endl;
-    ofs.close();
+void Taxi::saveToFile(string fileName = FILE_PATH_TAXI) {
+    if (!isObjectInFileDatabase(fileName)) {
+        cout << "saving taxi: " << Taxi::toString() << " to file:" << endl;
+        std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+        ofs << Taxi::toString() << endl;
+        ofs.close();
+    } else {
+        cout << "Item Taxi with Identification Name: " << getIdentification() << "already in the file" << endl;
+    }
 }
 
-void Taxi::isObjectInFileDatabase(string filename, string regNum) {
-    vector<Taxi> &resultVector();
-    // getAndIterateEachLineOfFileWithCallbackSaveIntoVector(filename, resultVector,)
+bool Taxi::isObjectInFileDatabase(string filename) {
+    // TODO: make one more check inside file database
+    return isItemExistInVector(getIdentification(), taxiVector);
 }
 
 void Taxi::addNewRoutePoint(const Point &p) {
     if (Point::isValid(p)) {
         this->getCurrentRoute().addNewRoutePoint(p);
-    } else cerr << "addNewRoutePoint -> Point is invalid" << endl; // TODO
+    } else cerr << "addNewRoutePoint -> Point is invalid" << endl;
 }
 
 void Taxi::addNewCarInfo(const Car &car) {
@@ -868,6 +910,22 @@ static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &
     return true;
 }
 
+template<class T>
+pair<int, T> findInVector(string identificationName, vector<T> v) {
+    pair<int, T> result;
+    result.first = -1;
+    auto it = find_if(v.begin(), v.end(), [&identificationName](const T &obj) {
+        return obj.getIdentification() == identificationName;
+    });
+    if (it != v.end()) {
+        // found element. it is an iterator to the first matching element.
+        // if you really need the index, you can also get it:
+        result.first = std::distance(v.begin(), it);
+        result.second = v.at(result.first);
+    }
+
+    return result;
+}
 
 template<class T>
 static bool getAndPutFileContentIntoGenericsVector(const string &fileName, vector <T> &vector) {
@@ -906,8 +964,6 @@ static bool getAndPutFileContentIntoGenericsVector(const string &fileName, vecto
     return true;
 }
 
-
-
 // TODO MAKE IT WITH GENERICS !!!!
 
 /*void extractDataFromLineIntoCarVector(const string &lineOfData, vector<Car> &carsVector) {
@@ -921,8 +977,7 @@ static bool getAndPutFileContentIntoGenericsVector(const string &fileName, vecto
     carsVector.push_back(newCar);
 }
 
-// TODO MAKE IT WITH GENERICS !!!!
-void extractDataFromLineIntoPointVector(const string &lineOfData, vector<Point> &pointsVector) {
+ void extractDataFromLineIntoPointVector(const string &lineOfData, vector<Point> &pointsVector) {
 
     Point newPoint;
 
@@ -934,8 +989,13 @@ void extractDataFromLineIntoPointVector(const string &lineOfData, vector<Point> 
     pointsVector.push_back(newPoint);
 }*/
 
-template<class T>
-static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vector<T> &vectorWithData) {
+//template<class T>
+//static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vector<T> &vectorWithData) {
+
+//    extractDataFromLineIntoGenericsObj(lineOfData, point);
+
+//    vectorWithData.push_back(dataObject);
+//    dataObject.saveToFile(FILE_PATH_DEBUG);
 //
 //    T dataObject;
 //    cerr << endl << "Deserialized: " << typeid(T).name() << endl;
@@ -959,15 +1019,15 @@ static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vect
 //            //if (dataObject type == T type)
 //            dataObject.addNewRoutePoint(newPoint);
 //        }
-    // }else if (lineOfData.substr(0,PREFIX_TAXI.size()) == PREFIX_TAXI) {
-    /*for (int i = 1; i < splitData.size(); i++) {
-        Point newPoint;
-        string pointDataStr = splitData.at(i);
-        deserializeStrData(pointDataStr);
-        extractDataFromLineIntoGenericsList(pointDataStr, pointList);
-        //dataObject.addNewRoutePoint(newPoint);
-    }*/
-    // }
+// }else if (lineOfData.substr(0,PREFIX_TAXI.size()) == PREFIX_TAXI) {
+/*for (int i = 1; i < splitData.size(); i++) {
+    Point newPoint;
+    string pointDataStr = splitData.at(i);
+    deserializeStrData(pointDataStr);
+    extractDataFromLineIntoGenericsList(pointDataStr, pointList);
+    //dataObject.addNewRoutePoint(newPoint);
+}*/
+// }
 //    } else cerr << endl << "?" << endl;
 //    string routeBasicInfo = insertDelimiterAtBeginnig(splitData.at(0), DELIMITER_START_LINE);
 //    deserializeStrData(routeBasicInfo);
@@ -979,7 +1039,7 @@ static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vect
 //
 //    cerr << endl << "Final: " << dataObject.toString() << endl; // DEBUG
 
-}
+//}
 
 static string insertDelimiterAtBeginnig(string &b, const string &delimiter) { return b.insert(0, delimiter); }
 
@@ -996,8 +1056,29 @@ static void extractDataFromLineIntoGenericsList(const string &lineOfData, list <
 
     streamWithObjectData >> dataObject;
     list.push_back(dataObject);
+    if (DEBUG) {
+        cerr << "GenericsList - after saved  " << typeid(T).name() << "  -> " << dataObject.toString() << endl; // DEBUG
+    }
+    streamWithObjectData.clear();
 
-    cerr << "GenericsList - after saved  " << typeid(T).name() << "  -> " << dataObject.toString() << endl; // DEBUG
+}
+
+template<class T>
+static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vector<T> &vector) {
+
+    T dataObject;
+    string copyOfLineOfData = lineOfData;
+
+    deserializeStrData(copyOfLineOfData);
+    //cerr << "GenericsList - before to save " << typeid(T).name() << "-> " << copyOfLineOfData << endl; // DEBUG
+
+    stringstream streamWithObjectData(copyOfLineOfData);
+
+    streamWithObjectData >> dataObject;
+    vector.push_back(dataObject);
+    if (DEBUG) {
+        cerr << "GenericsVector - after save " << typeid(T).name() << "->\n" << dataObject.toString() << endl; // DEBUG
+    }
     streamWithObjectData.clear();
 }
 
@@ -1014,8 +1095,10 @@ static void extractDataFromLineIntoGenericsObj(const string &lineOfData, T &data
     streamWithObjectData >> dataObject;
     //list.push_back(dataObject);
 
-    cerr << endl << "GenericsObj - after saved  " << typeid(T).name() << "  -> " << dataObject.toString()
-         << endl; // DEBUG
+    if (DEBUG) {
+        cerr << endl << "GenericsObj - after saved  " << typeid(T).name() << "  -> " << dataObject.toString()
+             << endl; // DEBUG
+    }
     streamWithObjectData.clear();
 }
 
@@ -1072,13 +1155,14 @@ static void stringToList(const string &stringWithData, list<T> &listOfData) {
 
 static void
 loadDataVectorsFromFiles(/*vector<Car> carsVector,vector<Point> pointVector,vector<Route> routesVector,vector<Taxi> taxiVector*/) {
-//   getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_CAR, carsVector,
-//                                                         extractDataFromLineIntoGenericsVector);
-//    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_POINT, pointVector,
-//                                                          extractDataFromLineIntoGenericsVector);
+    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_POINT, pointVector,
+                                                          extractDataFromLineIntoGenericsVector);
+    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_CAR, carsVector,
+                                                          extractDataFromLineIntoGenericsVector);
     getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_ROUTE, routesVector,
                                                           extractDataFromLineIntoGenericsVector);
-//    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_TAXI , taxiVector  , extractDataFromLineIntoGenericsVector);
+    getAndIterateEachLineOfFileWithCallbackSaveIntoVector(FILE_PATH_TAXI, taxiVector,
+                                                          extractDataFromLineIntoGenericsVector);
 }
 
 void testExtractFunct() {
@@ -1173,21 +1257,49 @@ void testTaxiFunctionality() {
 
 }
 
-////Debug
-//template<class T>
-//void bla(T clas){
-//    cout << (typeid(Taxi).name() == typeid(T).name()) << endl;
-//
-//}
-int main(int argc, const char **argv) {
-    testExtractFunct();
+void testLoadFromFileFunct() {
+    loadDataVectorsFromFiles();
+    if (DEBUG) {
+        cout << endl << "PointVector" << endl;
+        for (const auto &x: pointVector) cout << x.toString() << "\n";
 
+        cout << endl << "CarVector" << endl;
+        for (const auto &x: carsVector) cout << x.toString() << "\n";
+
+        cout << endl << "RouteVector" << endl;
+        for (const auto &x: routesVector) cout << x.toString() << "\n";
+
+        cout << endl << "TaxiVector" << endl;
+        for (const auto &x: taxiVector) cout << x.toString() << "\n";
+    }
+
+    const char *name = "Pesho";
+    isItemExistInVector("Pesho", taxiVector);
+    isItemExistInVector("Pekjsho", taxiVector);
+}
+
+template<class T>
+bool isItemExistInVector(string identificationName, const vector<T> &dataVector) {
+    auto findedItem = findInVector(identificationName, dataVector);
+    bool isExisting = findedItem.first >= 0;
+
+    if (DEBUG && isExisting) {
+        cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
+             << ", "
+             << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
+    } else
+        cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
+             << endl;
+
+    return isExisting;
+}
+
+int main(int argc, const char **argv) {
+    //  testExtractFunct();
+    testLoadFromFileFunct();
     // adminMenu();
     //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
-//    Car car;
-//    Taxi taxi;
-//    bla(taxi);
-//    testRouteFunctionality();
+    //testRouteFunctionality();
     //testTaxiFunctionality();
 
 
