@@ -267,7 +267,7 @@ string Point::toString() const {
     return PREFIX_POINT + ":" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
 }
 
-void Point::saveToFile(string fileName) {
+void Point::saveToFile(string fileName = FILE_PATH_POINT) {
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Point: " << Point::toString() << " to file: " << fileName << endl;;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
@@ -592,6 +592,11 @@ void Route::saveToFile(string fileName = FILE_PATH_ROUTE) {
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Route: " << Route::toString() << " to file: " << fileName << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+
+        for(auto point : getRoutePointsList()){
+            point.saveToFile();
+        }
+
         ofs << this->toString() << endl;
         ofs.close();
     } else {
@@ -674,6 +679,8 @@ public:
     friend istream &operator>>(istream &is, Taxi &taxi);
 
     string getIdentification() const override;
+
+    Car getCurrentCarInfo();
 };
 
 string Taxi::getIdentification() const {
@@ -717,6 +724,8 @@ void Taxi::saveToFile(string fileName = FILE_PATH_TAXI) {
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving taxi: " << Taxi::toString() << " to file:" << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
+        getCurrentRoute().saveToFile();
+        getCurrentCarInfo().saveToFile();
         ofs << Taxi::toString() << endl;
         ofs.close();
     } else {
@@ -742,6 +751,11 @@ void Taxi::addNewCarInfo(const Car &car) {
     this->setNumSeats(car.getNumSeats());
     this->setFuelPerKm(car.getFuelPerKm());
     this->setYearsOfUse(car.getYearsOfUse());
+}
+
+Car Taxi::getCurrentCarInfo() {
+    return Car(brand, model, yearsOfUse,numSeats,fuelPerKm,
+    registrationNumber);
 }
 
 // --------Implementation of static methods--------------------
@@ -1076,6 +1090,7 @@ static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vect
 
     streamWithObjectData >> dataObject;
     vector.push_back(dataObject);
+    dataObject.saveToFile();
     if (DEBUG) {
         cerr << "GenericsVector - after save " << typeid(T).name() << "->\n" << dataObject.toString() << endl; // DEBUG
     }
@@ -1273,7 +1288,6 @@ void testLoadFromFileFunct() {
         for (const auto &x: taxiVector) cout << x.toString() << "\n";
     }
 
-    const char *name = "Pesho";
     isItemExistInVector("Pesho", taxiVector);
     isItemExistInVector("Pekjsho", taxiVector);
 }
