@@ -255,7 +255,7 @@ void Point::setName(const string &newName) {
 }
 
 bool Point::isValid(const Point &p) {
-    return p.getX()>0 && p.getY()>0;
+    return p.getX() > 0 && p.getY() > 0;
     //return true;
 }
 
@@ -271,10 +271,10 @@ void Point::saveToFile(string fileName = FILE_PATH_POINT) {
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Point: " << Point::toString() << " to file: " << fileName << endl;;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-        ofs << this->toString();
+        ofs << this->toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+        cout << "Item Route with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -429,10 +429,10 @@ void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
 
         cout << "saving car: " << Car::toString() << " to file: " << fileName << endl;;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-        ofs << this->toString();
+        ofs << this->toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+        cout << "Item Route with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -589,18 +589,19 @@ void Route::print() {
 }
 
 void Route::saveToFile(string fileName = FILE_PATH_ROUTE) {
+
+    // check does nested objects are in the database, if not, they will be added
+    for (auto point : getRoutePointsList()) {
+        point.saveToFile();
+    }
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Route: " << Route::toString() << " to file: " << fileName << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
 
-        for(auto point : getRoutePointsList()){
-            point.saveToFile();
-        }
-
         ofs << this->toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Route with Identification Name: " << getIdentification() << "already in the file" << endl;
+        cout << "Item Route with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -721,15 +722,16 @@ string Taxi::toString() const {
 }
 
 void Taxi::saveToFile(string fileName = FILE_PATH_TAXI) {
+    // check does nested objects are in the database, if not, they will be added
+    getCurrentRoute().saveToFile();
+    getCurrentCarInfo().saveToFile();
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving taxi: " << Taxi::toString() << " to file:" << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
-        getCurrentRoute().saveToFile();
-        getCurrentCarInfo().saveToFile();
         ofs << Taxi::toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Taxi with Identification Name: " << getIdentification() << "already in the file" << endl;
+        cout << "Item Taxi with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -754,8 +756,8 @@ void Taxi::addNewCarInfo(const Car &car) {
 }
 
 Car Taxi::getCurrentCarInfo() {
-    return Car(brand, model, yearsOfUse,numSeats,fuelPerKm,
-    registrationNumber);
+    return Car(brand, model, yearsOfUse, numSeats, fuelPerKm,
+               registrationNumber);
 }
 
 // --------Implementation of static methods--------------------
@@ -907,7 +909,8 @@ template<class T>
 static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &fileName, vector<T> &dataVector,
                                                                   void (*callback)(const string &, vector<T> &)
 ) {// Open the File
-    ifstream in(fileName.c_str());
+    ifstream in(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios::app);
+    //in.open(fileName.c_str(), std::ios_base::in | std::ios_base::out);
     if (!in) {
         cerr << "Cannot open the File : " << fileName << std::endl;
         return false;
@@ -922,6 +925,22 @@ static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &
     //Close The File
     in.close();
     return true;
+}
+
+template<class T>
+bool isItemExistInVector(string identificationName, const vector<T> &dataVector) {
+    auto findedItem = findInVector(identificationName, dataVector);
+    bool isExisting = findedItem.first >= 0;
+
+    if (DEBUG && isExisting) {
+        cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
+             << ", "
+             << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
+    } else
+        cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
+             << endl;
+
+    return isExisting;
 }
 
 template<class T>
@@ -1292,39 +1311,13 @@ void testLoadFromFileFunct() {
     isItemExistInVector("Pekjsho", taxiVector);
 }
 
-template<class T>
-bool isItemExistInVector(string identificationName, const vector<T> &dataVector) {
-    auto findedItem = findInVector(identificationName, dataVector);
-    bool isExisting = findedItem.first >= 0;
-
-    if (DEBUG && isExisting) {
-        cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
-             << ", "
-             << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
-    } else
-        cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
-             << endl;
-
-    return isExisting;
-}
-
 int main(int argc, const char **argv) {
     //  testExtractFunct();
     testLoadFromFileFunct();
-    // adminMenu();
+     adminMenu();
     //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
     //testRouteFunctionality();
     //testTaxiFunctionality();
 
-
-//    if (result) {
-//        // Print the vector contents
-//        // for(Car car : carsVector){}
-//        //cout<< car.toString() << endl;
-//    }
-
-
     return 0;
 }
-
-

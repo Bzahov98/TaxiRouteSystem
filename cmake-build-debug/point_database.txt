@@ -1,0 +1,6 @@
+>PointName:aa,X: 1.000000,Y: 2.000000
+>PointName:ab,X: 3.000000,Y: 4.000000
+>PointName:ba,X: 5.000000,Y: 6.000000
+>PointName:bb,X: 7.000000,Y: 8.000000
+>PointName:a,X: 1.000000,Y: 2.000000
+>PointName:b,X: 3.000000,Y: 4.000000
