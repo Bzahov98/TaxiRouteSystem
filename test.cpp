@@ -49,6 +49,14 @@ static const char *const FILE_PATH_TAXI = "taxi_database.txt";
 static const char *const FILE_PATH_DEBUG = "debug_database.txt";
 
 static const char *const REGEX_DESERIALIZATION_OF_DATA = "([,|>](\\w+)[:])";
+static const char *const REGEX_NAME = "([\\w+ ])";
+static const char *const REGEX_CAR_NUMBER = "^([A-Z]{2}[0-9]{4}[A-Z]{2})";
+static const char *const REGEX_INFO = "([A-Z a-z0-9])+";
+
+static regex regexName(REGEX_NAME);
+static regex regexInfo(REGEX_INFO);
+static regex regexRegNumb(REGEX_CAR_NUMBER);
+
 
 static const char *const SERIALIZATION_STR_DEFAULT = "";
 
@@ -129,7 +137,7 @@ static void removeWhiteSpacesOfString(string &stringWithData);
 
 static void deserializeStrData(string &stringWithData);
 
-static void adminMenu() throw(InvalidInputException);
+static void adminMenu() noexcept(false);
 
 static bool addNewCars();
 
@@ -164,6 +172,7 @@ public:
 };
 
 //-------------
+static bool isValidCoords(double a, double b);
 
 class Point : Serializable {
 private:
@@ -173,10 +182,10 @@ private:
 public:
     Point() {
         setXY(0, 0);
-        setName(SERIALIZATION_STR_DEFAULT);
+        name = SERIALIZATION_STR_DEFAULT;
     }
 
-    Point(const string &name, double xx, double yy) {
+    Point(const string &newName, double xx, double yy) {
         setXY(xx, yy);
         setName(name);
     }
@@ -191,7 +200,7 @@ public:
         return x;
     }
 
-    void setX(double newX) throw() {
+    void setX(double newX) noexcept(false) {
         if (newX >= 0) {
             Point::x = newX;
         } else throw InvalidInputException("Point -> setX");
@@ -207,14 +216,18 @@ public:
 
     const string &getName() const;
 
-    void setName(const string &newName);
+    static bool isValid(const Point &p);
+
+    void setName(const string &newName) noexcept(false);
 
     void setXY(const double a, const double b) {
-        x = a;
-        y = b;
+        if (isValidCoords(a, b)) {
+            x = a;
+            y = b;
+        } else {
+            throw InvalidInputException("Invalid Coords");
+        }
     };
-
-    static bool isValid(const Point &p);
 
     void print() override;
 
@@ -242,6 +255,7 @@ public:
     string getIdentification() const override;
 };
 
+
 string Point::getIdentification() const {
     return getName();
 }
@@ -250,13 +264,14 @@ const string &Point::getName() const {
     return name;
 }
 
-void Point::setName(const string &newName) {
-    Point::name = newName;
+void Point::setName(const string &newName) noexcept(false) {
+    if (regex_match(newName, regexName)) {
+        Point::name = newName;
+    } else { throw InvalidInputException("Point: Invalid Name: " + newName); }
 }
 
 bool Point::isValid(const Point &p) {
     return p.getX() > 0 && p.getY() > 0;
-    //return true;
 }
 
 void Point::print() {
@@ -287,6 +302,10 @@ bool Point::isEmpty() {
     return name.empty() && x == 0 && y == 0;
 }
 
+bool isValidCoords(double a, double b) {
+    return a >= 0 && b >= 0;
+}
+
 // ---------
 class Car : Serializable {
 protected:
@@ -298,16 +317,16 @@ protected:
     int yearsOfUse;
 public:
     Car() {
-        setBrand(SERIALIZATION_STR_DEFAULT);
-        setModel(SERIALIZATION_STR_DEFAULT);
-        setYearsOfUse(0);
-        setNumSeats(0);
-        setFuelPerKm(0);
-        setRegistrationNumber(SERIALIZATION_STR_DEFAULT);
+        brand = SERIALIZATION_STR_DEFAULT;
+        model = SERIALIZATION_STR_DEFAULT;
+        yearsOfUse = 0;
+        numSeats = 0;
+        fuelPerKm = 0;
+        registrationNumber = SERIALIZATION_STR_DEFAULT;
     }
 
     Car(const string &brand, const string &model, int yearsOfUse, int numSeats, double fuelPerKm,
-        const string &registrationNumber) {
+        const string &registrationNumber) noexcept(false) {
         setBrand(brand);
         setModel(model);
         setYearsOfUse(yearsOfUse);
@@ -318,16 +337,19 @@ public:
 
     const string &getRegistrationNumber() const;
 
-    void setRegistrationNumber(const string &regNumber) throw(InvalidInputException);
+    void setRegistrationNumber(const string &regNumber) noexcept(false);
 
     const string &getBrand() const {
         return brand;
     }
 
     // TODO: make input check
-    void setBrand(const string &newBrand) {
-        Car::brand = newBrand;
-
+    void setBrand(const string &newBrand) noexcept(false) {
+        if (regex_match(newBrand, regexInfo)) {
+            Car::brand = newBrand;
+        } else {
+            throw InvalidInputException("Invalid Brand: " + newBrand);
+        }
     }
 
     const string &getModel() const {
@@ -335,34 +357,46 @@ public:
     }
 
     void setModel(const string &newModel) {
-        this->model = newModel;
+        if (regex_match(newModel, regexInfo)) {
+            this->model = newModel;
+        } else { throw InvalidInputException("Car: Invalid Model: " + newModel); }
     }
 
     int getYearsOfUse() const {
         return yearsOfUse;
     }
 
-    void setYearsOfUse(int newYearsOfUse) {
-        Car::yearsOfUse = newYearsOfUse;
+    void setYearsOfUse(int newYearsOfUse) noexcept(false) {
+        if (newYearsOfUse >= 0) {
+            Car::yearsOfUse = newYearsOfUse;
+        } else { throw InvalidInputException("Invalid newYearsOfUse"); }
+
     }
 
     int getNumSeats() const {
         return numSeats;
     }
 
-    void setNumSeats(int newNumSeats) {
-        Car::numSeats = newNumSeats;
+    void setNumSeats(int newNumSeats) noexcept(false) {
+        if (newNumSeats >= 0) {
+            Car::numSeats = newNumSeats;
+        } else { throw InvalidInputException("Invalid newNumSeats"); }
+
     }
 
     double getFuelPerKm() const {
         return fuelPerKm;
     }
 
-    void setFuelPerKm(double newFuelPerKm) {
-        Car::fuelPerKm = newFuelPerKm;
+    void setFuelPerKm(double newFuelPerKm) noexcept(false) {
+        if (newFuelPerKm >= 0.1) {
+            Car::fuelPerKm = newFuelPerKm;
+        } else { throw InvalidInputException("Invalid newFuelPerKm"); }
+
     }
 
-    void print() override;
+    void print()
+    override;
 
     virtual string toString() const;
 
@@ -392,7 +426,8 @@ public:
         return is;
     }
 
-    string getIdentification() const override;
+    string getIdentification() const
+    override;
 };
 
 string Car::getIdentification() const {
@@ -418,8 +453,8 @@ const string &Car::getRegistrationNumber() const {
     return registrationNumber;
 }
 
-void Car::setRegistrationNumber(const string &regNum) throw(InvalidInputException) {
-    if (true) { // TODO VALIDATE REGISTRATION NUMBER
+void Car::setRegistrationNumber(const string &regNum) noexcept(false) {
+    if (regex_match(regNum, regexRegNumb)) {
         Car::registrationNumber = regNum;
     } else throw InvalidInputException("Wrong registration Number");
 }
@@ -508,8 +543,11 @@ public:
         return name;
     }
 
-    void setName(const string &name) {
-        Route::name = name;
+    void setName(const string &newName) noexcept(false) {
+        if (regex_match(newName, regexName)) {
+            Route::name = newName;
+        } else throw InvalidInputException("Route: Wrong Name");
+
     }
 
     double getDistance() const {
@@ -517,7 +555,9 @@ public:
     }
 
     void setDistance(double dist) { // RENAMED param
-        Route::distance = dist;
+        if (dist > 0) {
+            Route::distance = dist;
+        } else throw InvalidInputException("Route: Distance is too short");
     }
 
     int getDailyRepeat() const {
@@ -525,10 +565,13 @@ public:
     }
 
     void setDailyRepeat(int newDailyRepeat) {
-        Route::dailyRepeat = newDailyRepeat;
+        if (newDailyRepeat > 0) {
+            Route::dailyRepeat = newDailyRepeat;
+        } else throw InvalidInputException("Route: newDailyRepeat is invalid");
+
     }
 
-    void addNewRoutePoint(Point p);
+    void addNewRoutePoint(const Point &p);
 
     string toString() const;
 
@@ -565,16 +608,18 @@ public:
     }
 
     string getIdentification() const override;
+
+    bool isValid() const;
 };
 
 string Route::getIdentification() const {
     return name;
 }
 
-void Route::addNewRoutePoint(Point p) {
+void Route::addNewRoutePoint(const Point &p) noexcept(false) {
     if (Point::isValid(p)) {
         routePointsList.push_back(p);
-    } else cerr << "addNewRoutePoint -> Point is invalid" << endl;
+    } else throw InvalidInputException("Route: addNewRoutePoint -> Point is invalid\"");
 }
 
 string Route::toString() const {
@@ -618,6 +663,11 @@ void Route::setRoutePointsList(const list<Point> &newRoutePointsList) {
     routePointsList = newRoutePointsList;
 }
 
+bool Route::isValid() const {
+    // TODO: implement Route::isValid()
+    return true;
+}
+
 // -----------
 class Taxi : public Car {
 protected:
@@ -649,16 +699,21 @@ public:
         return currentRoute;
     }
 
-    void setCurrentRoute(const Route &newRoute) {
-        Taxi::currentRoute = newRoute;
+    void setCurrentRoute(const Route &newRoute) noexcept(false) {
+        if (newRoute.isValid()) {
+            Taxi::currentRoute = newRoute;
+        } else throw InvalidInputException("Taxi: setCurrentRoute -> route is invalid\"");
     }
 
     const string &getDriverName() const {
         return driverName;
     }
 
-    void setDriverName(const string &newDriverName) {
-        Taxi::driverName = newDriverName;
+    void setDriverName(const string &newDriverName) noexcept(false) {
+        if (regex_match(newDriverName, regexName)) {
+            Taxi::driverName = newDriverName;
+        } else throw InvalidInputException("Taxi: newDriverName -> is invalid\"");
+
     }
 
     void print() override;
@@ -714,7 +769,12 @@ void Taxi::print() {
 double Taxi::calculatePerDayFuelUse() const {
     //извежда информация колко гориво да се зареди за извършване нa дневната обиколка
     // (repeats * distance) * fuelPerKM
-    return this->getCurrentRoute().calcRouteTotalDistance() * fuelPerKm;
+    double result = this->getCurrentRoute().calcRouteTotalDistance() * fuelPerKm;
+
+    cout << endl << "CalculatePerDayFuelUse: " << result << "liters of Taxi with: daily Repeats: "
+         << getCurrentRoute().getDailyRepeat() << " distance: " << getCurrentRoute().getDistance() << " fuelPerKm: "
+         << fuelPerKm << endl;
+    return result;
 }
 
 string Taxi::toString() const {
@@ -761,7 +821,7 @@ Car Taxi::getCurrentCarInfo() {
 }
 
 // --------Implementation of static methods--------------------
-static void adminMenu() throw(InvalidInputException) {
+static void adminMenu() noexcept(false) {
     cout << "Hello to taxi route system" << endl
          << "Hello taxi manager " << endl
          << "Please choose from the following options:" << endl
@@ -893,7 +953,7 @@ static bool addNewCars() {
     return false;
 }
 
-static void clientMenu() throw(InvalidInputException) {
+static void clientMenu() noexcept(false) {
     cout << "Hello to taxi route system" << endl
          << "Hello client " << endl
          << "Please choose from the following options:" << endl
@@ -1090,7 +1150,8 @@ static void extractDataFromLineIntoGenericsList(const string &lineOfData, list <
     streamWithObjectData >> dataObject;
     list.push_back(dataObject);
     if (DEBUG) {
-        cerr << "GenericsList - after saved  " << typeid(T).name() << "  -> " << dataObject.toString() << endl; // DEBUG
+        cerr << "GenericsList - after saved  " << typeid(T).name() << "  -> " << dataObject.toString()
+             << endl; // DEBUG
     }
     streamWithObjectData.clear();
 
@@ -1111,7 +1172,8 @@ static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vect
     vector.push_back(dataObject);
     dataObject.saveToFile();
     if (DEBUG) {
-        cerr << "GenericsVector - after save " << typeid(T).name() << "->\n" << dataObject.toString() << endl; // DEBUG
+        cerr << "GenericsVector - after save " << typeid(T).name() << "->\n" << dataObject.toString()
+             << endl; // DEBUG
     }
     streamWithObjectData.clear();
 }
@@ -1208,11 +1270,11 @@ void testExtractFunct() {
     extractDataFromLineIntoGenericsObj(p1.toString(), point);
     // Car
     Car car;
-    Car c1("newBrand1", "newModel1", 10, 20, 30, "CB1234CB");
+    Car c1("newBrandC", "newModelC", 10, 20, 30, "CB1234CB");
     extractDataFromLineIntoGenericsObj(c1.toString(), car);
     // Route
     Route route;
-    Route r("route69", 69, 2);
+    Route r("routeC", 69, 2);
     r.addNewRoutePoint(p1);
     r.addNewRoutePoint(p2);
 
@@ -1292,7 +1354,13 @@ void testTaxiFunctionality() {
 }
 
 void testLoadFromFileFunct() {
-    loadDataVectorsFromFiles();
+    try {
+        loadDataVectorsFromFiles();
+
+    } catch (InvalidInputException &e) {
+        cerr << e.getMessage() << endl;
+    }
+
     if (DEBUG) {
         cout << endl << "PointVector" << endl;
         for (const auto &x: pointVector) cout << x.toString() << "\n";
@@ -1305,16 +1373,20 @@ void testLoadFromFileFunct() {
 
         cout << endl << "TaxiVector" << endl;
         for (const auto &x: taxiVector) cout << x.toString() << "\n";
+
+        isItemExistInVector("Pesho", taxiVector);
+        auto taxi = findInVector("Pesho", taxiVector).second;
+        taxi.calculatePerDayFuelUse();
+        isItemExistInVector("Pekjsho", taxiVector);
     }
 
-    isItemExistInVector("Pesho", taxiVector);
-    isItemExistInVector("Pekjsho", taxiVector);
 }
 
 int main(int argc, const char **argv) {
     //  testExtractFunct();
     testLoadFromFileFunct();
-     adminMenu();
+
+    // adminMenu();
     //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
     //testRouteFunctionality();
     //testTaxiFunctionality();
