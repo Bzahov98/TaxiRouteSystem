@@ -23,9 +23,11 @@ static const char *const MENU_EXITING_WITHOUT_SAVING = "Exiting menu without sav
 static const char *const MENU_CHOSEN = "Chosen > ";
 static const char *const MENU_WRONG_OPTION_ERROR = "Please select right option";
 
-static const char *const ADMIN_MENU_NEW_CAR = "1.Create new Car object/s";
+static const char *const ADMIN_MENU_NEW_POINT = "1.Create new Point object/s";
 static const char *const ADMIN_MENU_NEW_ROUTE = "2.Create new Route object/s";
-static const char *const ADMIN_MENU_NEW_TAXI = "3.Create new Taxi object/s";
+static const char *const ADMIN_MENU_NEW_CAR = "3.Create new Car object/s";
+static const char *const ADMIN_MENU_NEW_TAXI = "4.Create new Taxi object/s";
+
 static const char *const ADMIN_MENU_NEW_TAXI_NO_ROUTES = "4.Create new Taxi object/s without routes";
 static const char *const ADMIN_MENU_CHANGE_TAXI_ROUTE = "5.Change Taxi route";
 static const char *const ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE = "6.Add point/s to existing Route";
@@ -38,7 +40,26 @@ static const char *const CAR_MENU_YEARS_OF_USE = "5. Add car's years of use";
 static const char *const CAR_MENU_FUEL_PER_KM = "6. Add car's fuel per km usage";
 static const char *const CAR_MENU_SAVE_CAR = "7. Save current car specifications";
 
+static const char *const ROUTE_MENU_ADD_NAME = "1. Add Route's Name";
+static const char *const ROUTE_MENU_ADD_DISTANCE = "2. Add Route's distance";
+static const char *const ROUTE_MENU_NUM_DAILY_REPEAT = "3. Add number of daily repeats";
+static const char *const ROUTE_MENU_ADD_POINT = "4. Add to the Route new point";
+static const char *const ROUTE_MENU_CALC_TOTAL_DISTANCE = "5. Calculate Route's total distance";
+//static const char *const ROUTE_MENU_FUEL_PER_KM = "6. Add Route's fuel per km usage";
+static const char *const ROUTE_MENU_SAVE = "6. Save current Route specifications";
+
+static const char *const POINT_MENU_ADD = "1. Add Point attributes";
+static const char *const POINT_MENU_SAVE = "2. Save current Point specifications";
+
 static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name";
+static const char *const TAXI_MENU_ADD_ROUTE = "2. Add Route's information";
+static const char *const TAXI_MENU_ADD_CAR = "3. Add Car's information";
+static const char *const TAXI_MENU_ADD_NONE = "4. NONE Add to Car new Route";
+static const char *const TAXI_MENU_CALC_TOTAL_DISTANCE = "5. Calculate Route's total distance";
+//static const char *const TAXI_MENU_FUEL_PER_KM = "6. Add Route's fuel per km usage";
+static const char *const TAXI_MENU_SAVE = "6. Save current Taxi's specifications";
+
+//static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name";
 
 
 static const char *const FILE_PATH_ROOT = "/home/bzahov/Documents/gitRepos/TU-University-Tasks/Programming Languages(PE) C++/Tasks/TaxiRouteSystem(CourseWork)/car_database.txt";
@@ -49,7 +70,7 @@ static const char *const FILE_PATH_TAXI = "taxi_database.txt";
 static const char *const FILE_PATH_DEBUG = "debug_database.txt";
 
 static const char *const REGEX_DESERIALIZATION_OF_DATA = "([,|>](\\w+)[:])";
-static const char *const REGEX_NAME = "([\\w+ ])";
+static const char *const REGEX_NAME = "([[A-Z a-z])+";
 static const char *const REGEX_CAR_NUMBER = "^([A-Z]{2}[0-9]{4}[A-Z]{2})";
 static const char *const REGEX_INFO = "([A-Z a-z0-9])+";
 
@@ -64,7 +85,7 @@ static const string PREFIX_POINT = ">PointName";
 static const string PREFIX_CAR = ">CarName";
 static const string PREFIX_ROUTE = ">RouteName";
 static const string PREFIX_TAXI = ">TaxiName";
-static const bool DEBUG = true;
+static const bool DEBUG = false;
 
 static const char *const DELIMITER_START_LINE = ">";
 
@@ -139,7 +160,13 @@ static void deserializeStrData(string &stringWithData);
 
 static void adminMenu() noexcept(false);
 
-static bool addNewCars();
+static bool pointsMenu(bool singlePick = false);
+
+static bool carsMenu(/*vector<Car> &resultVector,*/ bool singlePick = false);
+
+static bool routesMenu(/*vector<Route> &resultVector,*/ bool singlePick = false);
+
+static bool taxiMenu();
 
 static void loadDataVectorsFromFiles();
 
@@ -216,7 +243,7 @@ public:
 
     const string &getName() const;
 
-    static bool isValid(const Point &p);
+    bool isValid() const;
 
     void setName(const string &newName) noexcept(false);
 
@@ -270,8 +297,8 @@ void Point::setName(const string &newName) noexcept(false) {
     } else { throw InvalidInputException("Point: Invalid Name: " + newName); }
 }
 
-bool Point::isValid(const Point &p) {
-    return p.getX() > 0 && p.getY() > 0;
+bool Point::isValid() const {
+    return getX() > 0 && getY() > 0;
 }
 
 void Point::print() {
@@ -289,7 +316,7 @@ void Point::saveToFile(string fileName = FILE_PATH_POINT) {
         ofs << this->toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Route with Identification Name: " << getIdentification() << " - already in the file" << endl;
+        cout << "Item Point with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -337,7 +364,7 @@ public:
 
     const string &getRegistrationNumber() const;
 
-    void setRegistrationNumber(const string &regNumber) noexcept(false);
+    bool setRegistrationNumber(const string &regNumber) noexcept(false);
 
     const string &getBrand() const {
         return brand;
@@ -428,6 +455,8 @@ public:
 
     string getIdentification() const
     override;
+
+    bool isCarDataValid() const;
 };
 
 string Car::getIdentification() const {
@@ -453,10 +482,12 @@ const string &Car::getRegistrationNumber() const {
     return registrationNumber;
 }
 
-void Car::setRegistrationNumber(const string &regNum) noexcept(false) {
+bool Car::setRegistrationNumber(const string &regNum) noexcept(false) {
     if (regex_match(regNum, regexRegNumb)) {
         Car::registrationNumber = regNum;
+        return true;
     } else throw InvalidInputException("Wrong registration Number");
+    return false;
 }
 
 void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
@@ -467,7 +498,7 @@ void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
         ofs << this->toString() << endl;
         ofs.close();
     } else {
-        cout << "Item Route with Identification Name: " << getIdentification() << " - already in the file" << endl;
+        cout << "Item Car with Identification Name: " << getIdentification() << " - already in the file" << endl;
     }
 }
 
@@ -512,6 +543,16 @@ std::vector<Car> Car::readAllFromFile(string str) {
         // process pair (a,b)
     }
     return result;
+}
+
+bool Car::isCarDataValid() const {
+    try {
+        Car(brand, model, yearsOfUse, numSeats, fuelPerKm, registrationNumber);
+    } catch (InvalidInputException &e) {
+        cerr << "Car: " << e.getMessage() << endl;
+        return false;
+    }
+    return true;
 }
 
 
@@ -594,7 +635,7 @@ public:
         do {
             Point point;
             is >> point;
-            cerr << endl << point.toString() << endl;
+//            cerr << endl << point.toString() << endl;
             if (point.isEmpty()) {
                 break;
             }
@@ -617,9 +658,12 @@ string Route::getIdentification() const {
 }
 
 void Route::addNewRoutePoint(const Point &p) noexcept(false) {
-    if (Point::isValid(p)) {
+    if (p.isValid()) {
         routePointsList.push_back(p);
-    } else throw InvalidInputException("Route: addNewRoutePoint -> Point is invalid\"");
+    } else
+        throw InvalidInputException(
+                "Route -> Point " + p.getName() + " with coords(x,y): " + to_string(p.getX()) + "," +
+                to_string(p.getY()) + " is invalid ");
 }
 
 string Route::toString() const {
@@ -664,7 +708,13 @@ void Route::setRoutePointsList(const list<Point> &newRoutePointsList) {
 }
 
 bool Route::isValid() const {
-    // TODO: implement Route::isValid()
+    try {
+        Route route(name, distance, dailyRepeat);
+        route.setRoutePointsList(this->getRoutePointsList());
+    } catch (InvalidInputException &e) {
+        cerr << e.getMessage() << endl;
+        return false;
+    }
     return true;
 }
 
@@ -736,8 +786,32 @@ public:
 
     string getIdentification() const override;
 
-    Car getCurrentCarInfo();
+//    Car getCurrentCarInfo();
+
+    void setCurrentCarInfo(const Car &car);
+
+
+    bool isTaxiDataValid() const;
+
+    Car getCurrentCarInfo() const;
 };
+
+bool Taxi::isTaxiDataValid() const {
+    try {
+        bool isValid = regex_match(driverName, regexName) && getCurrentCarInfo().isCarDataValid() &&
+                       getCurrentRoute().isValid();
+        if (!isValid) {
+            cerr << "Taxi: is not valid" << endl;
+        }
+        return isValid;
+//        Car c(brand, model, yearsOfUse, numSeats, fuelPerKm, registrationNumber);
+//        Route();
+    } catch (InvalidInputException &e) {
+        cerr << "Taxi: " << e.getMessage() << endl;
+        return false;
+    }
+    return true;
+}
 
 string Taxi::getIdentification() const {
     return driverName;
@@ -771,7 +845,7 @@ double Taxi::calculatePerDayFuelUse() const {
     // (repeats * distance) * fuelPerKM
     double result = this->getCurrentRoute().calcRouteTotalDistance() * fuelPerKm;
 
-    cout << endl << "CalculatePerDayFuelUse: " << result << "liters of Taxi with: daily Repeats: "
+    cout << endl << "CalculatePerDayFuelUse: " << result << " liters of fuel for Taxi with: daily Repeats: "
          << getCurrentRoute().getDailyRepeat() << " distance: " << getCurrentRoute().getDistance() << " fuelPerKm: "
          << fuelPerKm << endl;
     return result;
@@ -786,7 +860,7 @@ void Taxi::saveToFile(string fileName = FILE_PATH_TAXI) {
     getCurrentRoute().saveToFile();
     getCurrentCarInfo().saveToFile();
     if (!isObjectInFileDatabase(fileName)) {
-        cout << "saving taxi: " << Taxi::toString() << " to file:" << endl;
+        cout << "saving taxi: " << Taxi::toString() << " to file: " << fileName << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
         ofs << Taxi::toString() << endl;
         ofs.close();
@@ -801,9 +875,9 @@ bool Taxi::isObjectInFileDatabase(string filename) {
 }
 
 void Taxi::addNewRoutePoint(const Point &p) {
-    if (Point::isValid(p)) {
+    if (p.isValid()) {
         this->getCurrentRoute().addNewRoutePoint(p);
-    } else cerr << "addNewRoutePoint -> Point is invalid" << endl;
+    } else cerr << "Taxi addNewRoutePoint -> Point is invalid" << endl;
 }
 
 void Taxi::addNewCarInfo(const Car &car) {
@@ -815,41 +889,68 @@ void Taxi::addNewCarInfo(const Car &car) {
     this->setYearsOfUse(car.getYearsOfUse());
 }
 
-Car Taxi::getCurrentCarInfo() {
+Car Taxi::getCurrentCarInfo() const {
     return Car(brand, model, yearsOfUse, numSeats, fuelPerKm,
                registrationNumber);
 }
 
+void Taxi::setCurrentCarInfo(const Car &car) {
+    setBrand(car.getBrand());
+    setModel(car.getModel());
+    setYearsOfUse(car.getYearsOfUse());
+    setNumSeats(car.getNumSeats());
+    setFuelPerKm(car.getFuelPerKm());
+    setRegistrationNumber(car.getRegistrationNumber());
+}
+
 // --------Implementation of static methods--------------------
+
+void getCarFromMenu(Car &newCar);
+
+void getRouteFromMenu(Route &newRoute);
+
+//void getTaxiFromMenu(Taxi &newTaxi);
+
+void getPointFromMenu(Point &point);
+
 static void adminMenu() noexcept(false) {
-    cout << "Hello to taxi route system" << endl
-         << "Hello taxi manager " << endl
-         << "Please choose from the following options:" << endl
-         << ADMIN_MENU_NEW_CAR << endl
-         << ADMIN_MENU_NEW_ROUTE << endl
-         << ADMIN_MENU_NEW_TAXI << endl
-         << ADMIN_MENU_NEW_TAXI_NO_ROUTES << endl
-         << ADMIN_MENU_CHANGE_TAXI_ROUTE << endl
-         << ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE << endl
-         << MENU_EXIT_OPTIONS << endl
-         << endl;
     bool isLooping = true;
+
+    cout << endl << "------------Main Menu-------------------------------------------" << endl
+         << "Hello to taxi route system" << endl
+         << "Hello taxi manager " << endl << endl;
     do {
+        cout << "Please choose from the following options:" << endl
+             << ADMIN_MENU_NEW_POINT << endl
+             << ADMIN_MENU_NEW_ROUTE << endl
+             << ADMIN_MENU_NEW_CAR << endl
+             << ADMIN_MENU_NEW_TAXI << endl
+             //         << ADMIN_MENU_NEW_TAXI_NO_ROUTES << endl
+             //         << ADMIN_MENU_CHANGE_TAXI_ROUTE << endl
+             //         << ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE << endl
+             << MENU_EXIT_OPTIONS << endl
+             << endl;
+        cin.clear();
+        cout.clear();
+
         char task = 0;
         cin >> task;
         switch (task) {
             case '1' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_CAR << endl;
-                isLooping = addNewCars();
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_POINT << endl;
+                isLooping = pointsMenu();
                 break;
             case '2' :
                 cout << MENU_CHOSEN << ADMIN_MENU_NEW_ROUTE << endl;
+                isLooping = routesMenu();
                 break;
             case '3' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_TAXI << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_CAR << endl;
+                isLooping = carsMenu();
                 break;
             case '4' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_TAXI_NO_ROUTES << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_TAXI << endl;
+                isLooping = taxiMenu();
                 break;
             case '5' :
                 cout << MENU_CHOSEN << ADMIN_MENU_CHANGE_TAXI_ROUTE << endl;
@@ -872,13 +973,47 @@ static void adminMenu() noexcept(false) {
     } while (isLooping);
 }
 
-static bool addNewCars() {
+bool carsMenu(bool singlePick/*vector<Car> &resultVector*/) {
     bool addMore = true;
     do {
         Car newCar = Car();
-        bool isLooping = true;
-        do {
-            cout << "Car Menu -> add Car's specifications" << endl
+        getCarFromMenu(newCar);
+        if (singlePick) addMore = false;
+        else {
+            string str;
+            cout << "> Add new Car: or close with q Q 0 for exit)\n" << endl;
+            cin >> str;
+            if (str == "q" || str == "Q" || str == "0") addMore = false;
+        }
+    } while (addMore);
+    return true;
+}
+
+static bool routesMenu(bool singlePick) { // def false
+    bool addMore = !singlePick;
+    do {
+        Route newRoute = Route();
+        getRouteFromMenu(newRoute);
+        if (!singlePick) {
+            string str;
+            cout << "> Add new Route: or close with q Q 0 for exit)\n" << endl;
+            cin >> str;
+            if (str == "q" || str == "Q" || str == "0") addMore = false;
+        } else {
+            addMore = false;
+            break;
+        }
+    } while (addMore);
+    return true;
+}
+
+void getCarFromMenu(Car &newCar) {
+    bool isLooping = true;
+    do {
+        try {
+            cout << endl << "````````Cars Menu``````````````" << endl
+                 << "Car Menu -> add Car's specifications" << endl
+                 << "Current Car: " << newCar.toString() << endl
                  << "Please choose from the following options:" << endl
                  << MENU_EXIT_OPTIONS << " without saving" << endl
                  << CAR_MENU_ADD_REG_NUMBER << endl
@@ -899,6 +1034,7 @@ static bool addNewCars() {
                     newCar.setRegistrationNumber(str);
                     break;
                 case '2' :
+
                     cout << MENU_CHOSEN << CAR_MENU_ADD_MODEL << endl;
                     cin >> str;
                     newCar.setModel(str);
@@ -927,8 +1063,13 @@ static bool addNewCars() {
                     newCar.setFuelPerKm(fuel);
                     break;
                 case '7' :
-                    cout << MENU_CHOSEN << "Save this car to program" << endl;
-                    newCar.saveToFile(FILE_PATH_CAR);
+                    if (newCar.isCarDataValid()) {
+                        cout << MENU_CHOSEN << "Save this car to program" << endl;
+                        newCar.saveToFile(FILE_PATH_CAR);
+                        carsVector.push_back(newCar);
+                    } else {
+                        cout << endl << MENU_CHOSEN << "Don't save car" << endl;
+                    }
                     isLooping = false;
                     break;
                 case 'q' :
@@ -940,17 +1081,259 @@ static bool addNewCars() {
                     cout << MENU_WRONG_OPTION_ERROR << endl;
                     break;
             }
+        } catch (InvalidInputException &e) {
+            cerr << e.getMessage() << endl;
+            continue;
+        }
+    } while (isLooping);
+//    cin.clear();
+//    cout.clear();
+}
+
+void getRouteFromMenu(Route &newRoute) {
+    bool isLooping = true;
+    do {
+        try {
+            cout << endl << "````````Routes Menu``````````````" << endl
+                 << "Route Menu -> add Route's specifications" << endl
+                 << "Current Route: " << newRoute.toString() << endl
+                 << "Please choose from the following options:" << endl
+                 << MENU_EXIT_OPTIONS << " without saving" << endl
+                 << ROUTE_MENU_ADD_NAME << endl
+                 << ROUTE_MENU_ADD_DISTANCE << endl
+                 << ROUTE_MENU_NUM_DAILY_REPEAT << endl
+                 << ROUTE_MENU_ADD_POINT << endl
+                 << ROUTE_MENU_CALC_TOTAL_DISTANCE << endl
+                 //                     << ROUTE_MENU_FUEL_PER_KM << endl
+                 << ROUTE_MENU_SAVE << endl
+                 << endl;
+            char option = 0;
+            cin >> option;
+            string str;
+            Point point;
+            switch (option) {
+                case '1' :
+                    cout << MENU_CHOSEN << ROUTE_MENU_ADD_NAME << endl;
+                    cin >> str;
+                    newRoute.setName(str);
+                    break;
+                case '2' :
+
+                    cout << MENU_CHOSEN << ROUTE_MENU_ADD_DISTANCE << endl;
+                    double distance;
+                    cin >> distance;
+                    newRoute.setDistance(distance);
+                    break;
+                case '3' :
+                    cout << MENU_CHOSEN << ROUTE_MENU_NUM_DAILY_REPEAT << endl;
+                    int dailyRepeats;
+                    cin >> dailyRepeats;
+                    newRoute.setDailyRepeat(dailyRepeats);
+                    break;
+                case '4' :
+                    cout << MENU_CHOSEN << ROUTE_MENU_ADD_POINT << endl;
+                    getPointFromMenu(point);
+                    newRoute.addNewRoutePoint(point);
+                    break;
+                case '5' :
+                    cout << MENU_CHOSEN << ROUTE_MENU_CALC_TOTAL_DISTANCE << endl;
+                    cout << "Route total distance is: " << newRoute.calcRouteTotalDistance();
+                    break;
+                case '6' :
+//                        cout << MENU_CHOSEN << ROUTE_MENU_FUEL_PER_KM << endl;
+//                        double fuel;
+//                        cin >> fuel;
+//                        newRoute.setFuelPerKm(fuel);
+//                        break;
+//                    case '7' :
+                    if (newRoute.isValid()) {
+                        cout << MENU_CHOSEN << "Save this Route to program" << endl;
+                        newRoute.saveToFile(FILE_PATH_ROUTE);
+                        routesVector.push_back(newRoute);
+                    } else {
+                        cout << endl << MENU_CHOSEN << "Didn't saved Route" << endl;
+                    }
+                    isLooping = false;
+                    break;
+                case 'q' :
+                case 'Q' :
+                case '0' :
+                    cout << MENU_EXITING_WITHOUT_SAVING << endl;
+                    isLooping = false;
+                default:
+                    cout << MENU_WRONG_OPTION_ERROR << endl;
+                    break;
+            }
+        } catch (InvalidInputException &e) {
+            cerr << e.getMessage() << endl;
+            isLooping = false;
+            continue;
+        }
+    } while (isLooping);
+    cin.clear();
+    cout.clear();
+}
+
+void getPointFromMenu(Point &newPoint) {
+    bool isLooping = true;
+    do {
+        try {
+            cout << endl << "````````POINTS Menu``````````````" << endl
+                 << "Point Menu -> add Route's specifications" << endl
+                 << "Current Point: " << newPoint.toString() << endl
+                 << "Please choose from the following options:" << endl
+                 << MENU_EXIT_OPTIONS << " without saving" << endl
+                 << POINT_MENU_ADD << endl
+                 << POINT_MENU_SAVE << endl
+                 << endl;
+            char option = 0;
+            cin >> option;
+            switch (option) {
+                case '1' :
+                    cout << MENU_CHOSEN << ROUTE_MENU_ADD_NAME << endl;
+                    cout << endl << "Note!!! Add Point data in sequence: \"PointName X-coord Y-coord\"" << endl;
+                    cin >> newPoint;
+                    break;
+                case '2' :
+                    if (newPoint.isValid()) {
+                        cout << MENU_CHOSEN << "Save this Route to program" << endl;
+                        newPoint.saveToFile(FILE_PATH_POINT);
+                        pointVector.push_back(newPoint);
+                    } else {
+                        cout << endl << MENU_CHOSEN << "Didn't saved the Point" << endl;
+                    }
+                    isLooping = false;
+                    break;
+                case 'q' :
+                case 'Q' :
+                case '0' :
+                    cout << MENU_EXITING_WITHOUT_SAVING << endl;
+                    isLooping = false;
+                    break;
+                default:
+                    cout << MENU_WRONG_OPTION_ERROR << endl;
+                    break;
+            }
+        } catch (InvalidInputException &e) {
+            cerr << e.getMessage() << endl;
+            isLooping = true;
+            continue;
+        }
+    } while (isLooping);
+}
+//void getPointFromMenu(const Point &point) {
+//    cout << endl << "Note!!! Add Point data in sequence: \"PointName X-coord Y-coord\"" << endl;
+//    cin >> (Point &) point;
+//}
+
+static bool taxiMenu() {
+    bool addMore = true;
+    do {
+        Taxi newTaxi = Taxi();
+        bool isLooping = true;
+        do {
+            try {
+                cout << endl << "````````Taxi Menu``````````````" << endl
+                     << "Taxi Menu -> add Taxi's specifications" << endl
+                     << "Is current Taxi valid?: " << newTaxi.isTaxiDataValid()<< " " << endl
+                     << "With Data: " << newTaxi.toString() << endl
+                     << "Please choose from the following options:" << endl
+                     << MENU_EXIT_OPTIONS << " without saving" << endl
+                     << TAXI_MENU_ADD_DRIVER_NAME << endl
+                     << TAXI_MENU_ADD_ROUTE << endl
+                     << TAXI_MENU_ADD_CAR << endl
+//                     << TAXI_MENU_ADD_NONE << endl
+                     << TAXI_MENU_CALC_TOTAL_DISTANCE << endl
+                     //                     << TAXI_MENU_FUEL_PER_KM << endl
+                     << TAXI_MENU_SAVE << endl
+                     << endl;
+                char option = 0;
+                cin >> option;
+                string str;
+                Point point;
+                Route r;
+                Car car;
+                switch (option) {
+                    case '1' :
+                        cout << MENU_CHOSEN << TAXI_MENU_ADD_DRIVER_NAME << endl;
+                        cin >> str;
+                        newTaxi.setDriverName(str);
+                        break;
+                    case '2' :
+
+                        cout << MENU_CHOSEN << TAXI_MENU_ADD_ROUTE << endl;
+                        getRouteFromMenu(r);
+                        newTaxi.setCurrentRoute(r);
+                        break;
+                    case '3' :
+                        cout << MENU_CHOSEN << TAXI_MENU_ADD_CAR << endl;
+                        getCarFromMenu(car);
+                        newTaxi.setCurrentCarInfo(car);
+                        break;
+                    case '4' :
+                        cout << MENU_CHOSEN << TAXI_MENU_ADD_NONE << endl
+                             << "Note!!! Add Point data in sequence: \"PointName X-coord Y-coord\"" << endl;
+                        cin >> point;
+                        newTaxi.addNewRoutePoint(point);
+                        break;
+                    case '5' :
+                        cout << MENU_CHOSEN << TAXI_MENU_CALC_TOTAL_DISTANCE << endl;
+                        cout << "Taxi total distance is: " << newTaxi.calculatePerDayFuelUse();
+                        break;
+                    case '6' :
+//                        cout << MENU_CHOSEN << TAXI_MENU_FUEL_PER_KM << endl;
+//                        double fuel;
+//                        cin >> fuel;
+//                        newTaxi.setFuelPerKm(fuel);
+//                        break;
+//                    case '7' :
+                        if (newTaxi.isCarDataValid()) {
+                            cout << MENU_CHOSEN << "Save this Taxi to program" << endl;
+                            newTaxi.saveToFile(FILE_PATH_ROUTE);
+                            taxiVector.push_back(newTaxi);
+                        } else {
+                            cout << endl << MENU_CHOSEN << "Didn't saved Taxi to file!" << endl;
+                        }
+                        isLooping = false;
+                        break;
+                    case 'q' :
+                    case 'Q' :
+                    case '0' :
+                        cout << MENU_EXITING_WITHOUT_SAVING << endl;
+                        isLooping = false;
+                    default:
+                        cout << MENU_WRONG_OPTION_ERROR << endl;
+                        break;
+                }
+            } catch (InvalidInputException &e) {
+                cerr << endl << e.getMessage() << endl;
+                continue;
+            }
         } while (isLooping);
         string str;
-        cout << "> Add new Car:\n(write q for exit)\n"
-             << "Write regNumber:"
-             << endl;
+        cout << "> Add new Taxi: or close with q Q 0 for exit)\n" << endl;
         cin >> str;
-        cout << str;
-        newCar.setRegistrationNumber(str);
-        if (str == "q") addMore = false;
+        if (str == "q" || str == "Q" || str == "0") addMore = false;
     } while (addMore);
-    return false;
+    return true;
+}
+
+
+static bool pointsMenu(bool singlePick) {
+
+    bool addMore = true;
+    do {
+        Point point;
+        getPointFromMenu(point);
+        if (singlePick) { addMore = false; }
+        else {
+            string str;
+            cout << ">click any key to continue to Add new Point: or close with q Q 0 for exit)\n" << endl;
+            cin >> str;
+            if (str == "q" || str == "Q" || str == "0") addMore = false;
+        }
+    } while (addMore);
+    return true;
 }
 
 static void clientMenu() noexcept(false) {
@@ -991,15 +1374,15 @@ template<class T>
 bool isItemExistInVector(string identificationName, const vector<T> &dataVector) {
     auto findedItem = findInVector(identificationName, dataVector);
     bool isExisting = findedItem.first >= 0;
-
-    if (DEBUG && isExisting) {
-        cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
-             << ", "
-             << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
-    } else
-        cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
-             << endl;
-
+    if (DEBUG) {
+        if (isExisting) {
+            cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
+                 << ", "
+                 << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
+        } else
+            cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
+                 << endl;
+    }
     return isExisting;
 }
 
@@ -1353,6 +1736,10 @@ void testTaxiFunctionality() {
 
 }
 
+//void getCarFromMenu(Car &newCar) {
+//
+//}
+
 void testLoadFromFileFunct() {
     try {
         loadDataVectorsFromFiles();
@@ -1361,7 +1748,7 @@ void testLoadFromFileFunct() {
         cerr << e.getMessage() << endl;
     }
 
-    if (DEBUG) {
+    if (false) {
         cout << endl << "PointVector" << endl;
         for (const auto &x: pointVector) cout << x.toString() << "\n";
 
@@ -1386,7 +1773,7 @@ int main(int argc, const char **argv) {
     //  testExtractFunct();
     testLoadFromFileFunct();
 
-    // adminMenu();
+    adminMenu();
     //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
     //testRouteFunctionality();
     //testTaxiFunctionality();
