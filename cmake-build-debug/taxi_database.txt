@@ -1,1 +1,3 @@
 >TaxiName:Pesho>CarName: CA1234CA,brand: myBrandA,model: myModelA,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1>RouteName:routeA,distance: 21.000000,dailyRepeat: 1>PointName:a,X: 1.000000,Y: 2.000000>PointName:b,X: 3.000000,Y: 4.000000
+>TaxiName:bbbzz>CarName: CC9988CA,brand: aaBBrand,model: AbModel,seats: 5,fuelPerKm: 6.000000,yearsOfUse:5>RouteName:routeeee,distance: 33.000000,dailyRepeat: 3>PointName:vv,X: 33.000000,Y: 44.000000
+>TaxiName:Bojoo>CarName: CC2312CA,brand: Benz,model: Mercedes,seats: 5,fuelPerKm: 7.000000,yearsOfUse:4>RouteName:aaaa,distance: 2.000000,dailyRepeat: 3>PointName:ee,X: 22.000000,Y: 55.000000>PointName:rrrr,X: 33.000000,Y: 55.000000

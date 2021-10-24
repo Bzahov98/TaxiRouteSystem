@@ -29,8 +29,8 @@ static const char *const ADMIN_MENU_NEW_CAR = "3.Create new Car object/s";
 static const char *const ADMIN_MENU_NEW_TAXI = "4.Create new Taxi object/s";
 
 static const char *const ADMIN_MENU_NEW_TAXI_NO_ROUTES = "4.Create new Taxi object/s without routes";
-static const char *const ADMIN_MENU_CHANGE_TAXI_ROUTE = "5.Change Taxi route";
-static const char *const ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE = "6.Add point/s to existing Route";
+static const char *const ADMIN_MENU_CALCULATE_ROUTE_TOTAL_DISTANCE = "5. Calculate total distance for all Routes";
+static const char *const ADMIN_MENU_CALCULATE_TAXI_FUEL_USAGE = "6. Calculate fuel per km for all Taxi routes";
 
 static const char *const CAR_MENU_ADD_REG_NUMBER = "1. Add car's Registration Number";
 static const char *const CAR_MENU_ADD_MODEL = "2. Add car's model";
@@ -55,9 +55,9 @@ static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name"
 static const char *const TAXI_MENU_ADD_ROUTE = "2. Add Route's information";
 static const char *const TAXI_MENU_ADD_CAR = "3. Add Car's information";
 static const char *const TAXI_MENU_ADD_NONE = "4. NONE Add to Car new Route";
-static const char *const TAXI_MENU_CALC_TOTAL_DISTANCE = "5. Calculate Route's total distance";
+static const char *const TAXI_MENU_CALC_TOTAL_DISTANCE = "5.Calculate Route's total distance";
 //static const char *const TAXI_MENU_FUEL_PER_KM = "6. Add Route's fuel per km usage";
-static const char *const TAXI_MENU_SAVE = "6. Save current Taxi's specifications";
+static const char *const TAXI_MENU_SAVE = "6.Save current Taxi's specifications";
 
 //static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name";
 
@@ -154,10 +154,6 @@ static void removeWhiteSpacesOfString(string &stringWithData);
 
 static void deserializeStrData(string &stringWithData);
 
-static void removeWhiteSpacesOfString(string &stringWithData);
-
-static void deserializeStrData(string &stringWithData);
-
 static void adminMenu() noexcept(false);
 
 static bool pointsMenu(bool singlePick = false);
@@ -177,7 +173,7 @@ static vector<string> split(const string &str, const string &delimiter);
 void testTaxiFunctionality();
 
 template<class T>
-bool isItemExistInVector(basic_string<char> identificationName, const vector<T> &dataVector);
+static bool isItemExistInVector(basic_string<char> identificationName, const vector<T> &dataVector);
 
 static vector<Car> carsVector;
 static vector<Route> routesVector;
@@ -196,6 +192,8 @@ public:
     virtual string toString() const = 0;
 
     virtual void print() = 0;
+
+    virtual string getFilePath() const = 0;
 };
 
 //-------------
@@ -258,7 +256,7 @@ public:
 
     void print() override;
 
-    string toString() const;
+    string toString() const override;
 
     friend ostream &operator<<(ostream &os, const Point &point) {
         os << point.toString();
@@ -275,11 +273,15 @@ public:
 public:
     void saveToFile(string fileName) override;
 
-    bool isObjectInFileDatabase(string parameter) override;
+    bool isObjectInFileDatabase(string filename) override;
 
     bool isEmpty();
 
     string getIdentification() const override;
+
+    string getFilePath() const override {
+        return FILE_PATH_POINT;
+    }
 };
 
 
@@ -309,7 +311,7 @@ string Point::toString() const {
     return PREFIX_POINT + ":" + getName() + ",X: " + to_string(getX()) + ",Y: " + to_string(getY());
 }
 
-void Point::saveToFile(string fileName = FILE_PATH_POINT) {
+void Point::saveToFile(string fileName) {
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Point: " << Point::toString() << " to file: " << fileName << endl;;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
@@ -425,13 +427,13 @@ public:
     void print()
     override;
 
-    virtual string toString() const;
+    string toString() const override;
 
-    virtual void saveToFile(string str);
+    void saveToFile(string fileName) override;
 
-    virtual bool isObjectInFileDatabase(string filename);
+    bool isObjectInFileDatabase(string filename) override;
 
-    static std::vector<Car> readAllFromFile(string str);
+//    static std::vector<Car> readAllFromFile(const string& str);
 
     friend ostream &operator<<(ostream &os, const Car &car) {
         os << car.toString() << endl;
@@ -457,6 +459,10 @@ public:
     override;
 
     bool isCarDataValid() const;
+
+    string getFilePath() const override {
+        return FILE_PATH_CAR;
+    }
 };
 
 string Car::getIdentification() const {
@@ -490,7 +496,7 @@ bool Car::setRegistrationNumber(const string &regNum) noexcept(false) {
     return false;
 }
 
-void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
+void Car::saveToFile(const string fileName) {
     if (!isObjectInFileDatabase(fileName)) {
 
         cout << "saving car: " << Car::toString() << " to file: " << fileName << endl;;
@@ -502,48 +508,48 @@ void Car::saveToFile(const string fileName = FILE_PATH_CAR) {
     }
 }
 
-bool Car::isObjectInFileDatabase(string str) {
+bool Car::isObjectInFileDatabase(string filename) {
     // TODO: make one more check inside file database
     return isItemExistInVector(getIdentification(), carsVector);
 }
 
-std::vector<Car> Car::readAllFromFile(string str) {
-    std::vector<Car> result;
-    /*char *line= "";
-    size_t len = 0;
-    ssize_t nread;
-    cout << "\n-----g3g---\n";
-/*
-
-    stream = fopen(FILE_PATH_CAR, "r");
-    if (stream == NULL) {
-        perror("fopen");
-        throw (InvalidInputException("wrong file path"));
-    }
-
-
-    while ((nread = getline(&line, &len, stream)) != -1) {
-        printf("Retrieved line of length %zu:\n", nread);
-        cout << line;
-        //fwrite(line, nread, 1, stdout);
-    }
-
-    free(line);
-    fclose(stream);
-//-----
-    std::ifstream ifs(FILE_PATH_CAR,fstream::in);
-    cout<< ifs.get();
-    ifs.getline(line,256);
-    cout << line;
-    ifs.close();*/
-
-    std::ifstream infile(FILE_PATH_CAR, fstream::in);
-    int a, b;
-    while (infile >> a >> b) {
-        // process pair (a,b)
-    }
-    return result;
-}
+//std::vector<Car> Car::readAllFromFile(const string& str) {
+//    std::vector<Car> result;
+//    /*char *line= "";
+//    size_t len = 0;
+//    ssize_t nread;
+//    cout << "\n-----g3g---\n";
+///*
+//
+//    stream = fopen(FILE_PATH_CAR, "r");
+//    if (stream == NULL) {
+//        perror("fopen");
+//        throw (InvalidInputException("wrong file path"));
+//    }
+//
+//
+//    while ((nread = getline(&line, &len, stream)) != -1) {
+//        printf("Retrieved line of length %zu:\n", nread);
+//        cout << line;
+//        //fwrite(line, nread, 1, stdout);
+//    }
+//
+//    free(line);
+//    fclose(stream);
+////-----
+//    std::ifstream ifs(FILE_PATH_CAR,fstream::in);
+//    cout<< ifs.get();
+//    ifs.getline(line,256);
+//    cout << line;
+//    ifs.close();*/
+//
+//    std::ifstream infile(FILE_PATH_CAR, fstream::in);
+//    int a, b;
+//    while (infile >> a >> b) {
+//        // process pair (a,b)
+//    }
+//    return result;
+//}
 
 bool Car::isCarDataValid() const {
     try {
@@ -614,7 +620,7 @@ public:
 
     void addNewRoutePoint(const Point &p);
 
-    string toString() const;
+    string toString() const override;
 
     void print() override;
 
@@ -651,6 +657,10 @@ public:
     string getIdentification() const override;
 
     bool isValid() const;
+
+    string getFilePath() const override {
+        return FILE_PATH_ROUTE;
+    }
 };
 
 string Route::getIdentification() const {
@@ -677,11 +687,11 @@ void Route::print() {
     cout << Route::toString();
 }
 
-void Route::saveToFile(string fileName = FILE_PATH_ROUTE) {
+void Route::saveToFile(string fileName) {
 
     // check does nested objects are in the database, if not, they will be added
     for (auto point : getRoutePointsList()) {
-        point.saveToFile();
+        point.saveToFile(FILE_PATH_POINT);
     }
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving Route: " << Route::toString() << " to file: " << fileName << endl;
@@ -794,6 +804,10 @@ public:
     bool isTaxiDataValid() const;
 
     Car getCurrentCarInfo() const;
+
+    string getFilePath() const override {
+        return FILE_PATH_TAXI;
+    }
 };
 
 bool Taxi::isTaxiDataValid() const {
@@ -855,10 +869,10 @@ string Taxi::toString() const {
     return PREFIX_TAXI + ":" + driverName + Car::toString().append(currentRoute.toString());
 }
 
-void Taxi::saveToFile(string fileName = FILE_PATH_TAXI) {
+void Taxi::saveToFile(string fileName) {
     // check does nested objects are in the database, if not, they will be added
-    getCurrentRoute().saveToFile();
-    getCurrentCarInfo().saveToFile();
+    getCurrentRoute().saveToFile(FILE_PATH_ROUTE);
+    getCurrentCarInfo().saveToFile(FILE_PATH_CAR);
     if (!isObjectInFileDatabase(fileName)) {
         cout << "saving taxi: " << Taxi::toString() << " to file: " << fileName << endl;
         std::ofstream ofs(fileName, fstream::in | fstream::out | fstream::app);
@@ -918,16 +932,17 @@ static void adminMenu() noexcept(false) {
 
     cout << endl << "------------Main Menu-------------------------------------------" << endl
          << "Hello to taxi route system" << endl
-         << "Hello taxi manager " << endl << endl;
+         << "Hello taxi manager ";
     do {
-        cout << "Please choose from the following options:" << endl
+        cout << endl << "----------------------------------------------------------------" << endl
+             << "Please choose from the following options:" << endl
              << ADMIN_MENU_NEW_POINT << endl
              << ADMIN_MENU_NEW_ROUTE << endl
              << ADMIN_MENU_NEW_CAR << endl
              << ADMIN_MENU_NEW_TAXI << endl
              //         << ADMIN_MENU_NEW_TAXI_NO_ROUTES << endl
-             //         << ADMIN_MENU_CHANGE_TAXI_ROUTE << endl
-             //         << ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE << endl
+             << ADMIN_MENU_CALCULATE_ROUTE_TOTAL_DISTANCE << endl
+             << ADMIN_MENU_CALCULATE_TAXI_FUEL_USAGE << endl
              << MENU_EXIT_OPTIONS << endl
              << endl;
         cin.clear();
@@ -937,26 +952,38 @@ static void adminMenu() noexcept(false) {
         cin >> task;
         switch (task) {
             case '1' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_POINT << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_POINT << endl << endl;
                 isLooping = pointsMenu();
                 break;
             case '2' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_ROUTE << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_ROUTE << endl << endl;
                 isLooping = routesMenu();
                 break;
             case '3' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_CAR << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_CAR << endl << endl;
                 isLooping = carsMenu();
                 break;
             case '4' :
-                cout << MENU_CHOSEN << ADMIN_MENU_NEW_TAXI << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_NEW_TAXI << endl << endl;
                 isLooping = taxiMenu();
                 break;
             case '5' :
-                cout << MENU_CHOSEN << ADMIN_MENU_CHANGE_TAXI_ROUTE << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_CALCULATE_ROUTE_TOTAL_DISTANCE << endl << endl;
+                for (const Route &r : routesVector) {
+                    cout << "For Route: " << r.toString() << endl <<
+                         "Total distance is: " << r.calcRouteTotalDistance() << endl << endl;
+                }
                 break;
             case '6' :
-                cout << MENU_CHOSEN << ADMIN_MENU_ADD_REMOVE_POINTS_OF_ROUTE << endl;
+                cout << MENU_CHOSEN << ADMIN_MENU_CALCULATE_TAXI_FUEL_USAGE << endl << endl;
+                for (const Taxi &taxi : taxiVector) {
+                    cout << "For Taxi " << taxi.toString() << endl <<
+                         "Total distance for current Route is: " << taxi.getCurrentRoute().calcRouteTotalDistance()
+                         << endl <<
+                         "And Fuel Usage Per km  is: ";
+                    taxi.calculatePerDayFuelUse();
+                    cout << endl;
+                }
                 break;
             case '7' :
                 cout << MENU_CHOSEN << endl;
@@ -967,7 +994,7 @@ static void adminMenu() noexcept(false) {
                 cout << MENU_EXITING << endl;
                 isLooping = false;
             default:
-                cout << MENU_WRONG_OPTION_ERROR << endl;
+                cout << MENU_WRONG_OPTION_ERROR << endl << endl;
                 break;
         }
     } while (isLooping);
@@ -1235,14 +1262,14 @@ static bool taxiMenu() {
             try {
                 cout << endl << "````````Taxi Menu``````````````" << endl
                      << "Taxi Menu -> add Taxi's specifications" << endl
-                     << "Is current Taxi valid?: " << newTaxi.isTaxiDataValid()<< " " << endl
+                     << "Is current Taxi valid?: " << newTaxi.isTaxiDataValid() << " " << endl
                      << "With Data: " << newTaxi.toString() << endl
                      << "Please choose from the following options:" << endl
                      << MENU_EXIT_OPTIONS << " without saving" << endl
                      << TAXI_MENU_ADD_DRIVER_NAME << endl
                      << TAXI_MENU_ADD_ROUTE << endl
                      << TAXI_MENU_ADD_CAR << endl
-//                     << TAXI_MENU_ADD_NONE << endl
+                     //                     << TAXI_MENU_ADD_NONE << endl
                      << TAXI_MENU_CALC_TOTAL_DISTANCE << endl
                      //                     << TAXI_MENU_FUEL_PER_KM << endl
                      << TAXI_MENU_SAVE << endl
@@ -1289,7 +1316,7 @@ static bool taxiMenu() {
 //                    case '7' :
                         if (newTaxi.isCarDataValid()) {
                             cout << MENU_CHOSEN << "Save this Taxi to program" << endl;
-                            newTaxi.saveToFile(FILE_PATH_ROUTE);
+                            newTaxi.saveToFile(FILE_PATH_TAXI);
                             taxiVector.push_back(newTaxi);
                         } else {
                             cout << endl << MENU_CHOSEN << "Didn't saved Taxi to file!" << endl;
@@ -1372,13 +1399,13 @@ static bool getAndIterateEachLineOfFileWithCallbackSaveIntoVector(const string &
 
 template<class T>
 bool isItemExistInVector(string identificationName, const vector<T> &dataVector) {
-    auto findedItem = findInVector(identificationName, dataVector);
-    bool isExisting = findedItem.first >= 0;
+    auto foundItem = findInVector(identificationName, dataVector);
+    bool isExisting = foundItem.first >= 0;
     if (DEBUG) {
         if (isExisting) {
-            cerr << "item with identName: " << identificationName << " exist at index in vector: " << findedItem.first
+            cerr << "item with identName: " << identificationName << " exist at index in vector: " << foundItem.first
                  << ", "
-                 << typeid(T).name() << ":\n" << findedItem.second.toString() << endl;
+                 << typeid(T).name() << ":\n" << foundItem.second.toString() << endl;
         } else
             cerr << "item with identName: " << identificationName << " does not exist in vector:" << typeid(T).name()
                  << endl;
@@ -1553,7 +1580,7 @@ static void extractDataFromLineIntoGenericsVector(const string &lineOfData, vect
 
     streamWithObjectData >> dataObject;
     vector.push_back(dataObject);
-    dataObject.saveToFile();
+    dataObject.saveToFile(dataObject.getFilePath());
     if (DEBUG) {
         cerr << "GenericsVector - after save " << typeid(T).name() << "->\n" << dataObject.toString()
              << endl; // DEBUG
@@ -1741,6 +1768,8 @@ void testTaxiFunctionality() {
 //}
 
 void testLoadFromFileFunct() {
+    cout << "-----------------------------------------------" << endl
+         << "Load Data from the Database:" << endl;
     try {
         loadDataVectorsFromFiles();
 
@@ -1748,7 +1777,7 @@ void testLoadFromFileFunct() {
         cerr << e.getMessage() << endl;
     }
 
-    if (false) {
+    if (DEBUG) {
         cout << endl << "PointVector" << endl;
         for (const auto &x: pointVector) cout << x.toString() << "\n";
 
@@ -1774,7 +1803,7 @@ int main(int argc, const char **argv) {
     testLoadFromFileFunct();
 
     adminMenu();
-    //loadDataVectorsFromFiles(/*carsVector,pointVector,routesVector,taxiVector*/);
+    //loadDataVectorsFromFiles();
     //testRouteFunctionality();
     //testTaxiFunctionality();
 
