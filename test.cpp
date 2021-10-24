@@ -29,8 +29,8 @@ static const char *const ADMIN_MENU_NEW_CAR = "3.Create new Car object/s";
 static const char *const ADMIN_MENU_NEW_TAXI = "4.Create new Taxi object/s";
 
 static const char *const ADMIN_MENU_NEW_TAXI_NO_ROUTES = "4.Create new Taxi object/s without routes";
-static const char *const ADMIN_MENU_CALCULATE_ROUTE_TOTAL_DISTANCE = "5. Calculate total distance for all Routes";
-static const char *const ADMIN_MENU_CALCULATE_TAXI_FUEL_USAGE = "6. Calculate fuel per km for all Taxi routes";
+static const char *const ADMIN_MENU_CALCULATE_ROUTE_TOTAL_DISTANCE = "5.Calculate total distance for all Routes";
+static const char *const ADMIN_MENU_CALCULATE_TAXI_FUEL_USAGE = "6.Calculate fuel per km for all Taxi routes";
 
 static const char *const CAR_MENU_ADD_REG_NUMBER = "1. Add car's Registration Number";
 static const char *const CAR_MENU_ADD_MODEL = "2. Add car's model";
@@ -55,9 +55,9 @@ static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name"
 static const char *const TAXI_MENU_ADD_ROUTE = "2. Add Route's information";
 static const char *const TAXI_MENU_ADD_CAR = "3. Add Car's information";
 static const char *const TAXI_MENU_ADD_NONE = "4. NONE Add to Car new Route";
-static const char *const TAXI_MENU_CALC_TOTAL_DISTANCE = "5.Calculate Route's total distance";
+static const char *const TAXI_MENU_CALC_TOTAL_DISTANCE = "5. Calculate Route's total distance";
 //static const char *const TAXI_MENU_FUEL_PER_KM = "6. Add Route's fuel per km usage";
-static const char *const TAXI_MENU_SAVE = "6.Save current Taxi's specifications";
+static const char *const TAXI_MENU_SAVE = "6. Save current Taxi's specifications";
 
 //static const char *const TAXI_MENU_ADD_DRIVER_NAME = "1. Add Taxi's Driver Name";
 
