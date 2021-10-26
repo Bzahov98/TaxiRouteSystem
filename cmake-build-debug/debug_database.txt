@@ -1,0 +1,1 @@
+>TaxiName:Pesho>CarName: NULL,brand: NULL,model: NULL,seats: 0,fuelPerKm: 0.000000,yearsOfUse:0>RouteName:,distance: 0.000000,dailyRepeat: 0

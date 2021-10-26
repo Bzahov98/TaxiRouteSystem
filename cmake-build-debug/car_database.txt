@@ -1,0 +1,3 @@
+>CarName: CA1234CA,brand: myBrandA,model: myModelA,seats: 2,fuelPerKm: 3.000000,yearsOfUse:1
+>CarName: CC2312CA,brand: Benz,model: Mercedes,seats: 5,fuelPerKm: 7.000000,yearsOfUse:4
+>CarName: CC9988CA,brand: aaBBrand,model: AbModel,seats: 5,fuelPerKm: 6.000000,yearsOfUse:5

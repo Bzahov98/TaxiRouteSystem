@@ -1,3 +1,4 @@
->RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
->RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
->RouteName:route1,distance: 21.000000,dailyRepeat: 1>name:a,X: 1.000000,Y: 2.000000>name:b,X: 3.000000,Y: 4.000000
+>RouteName:routeA,distance: 21.000000,dailyRepeat: 1>PointName:a,X: 1.000000,Y: 2.000000>PointName:b,X: 3.000000,Y: 4.000000
+>RouteName:asd,distance: 3.300000,dailyRepeat: 1>PointName:apoint,X: 2.000000,Y: 3.000000>PointName:bpoint,X: 5.000000,Y: 9.000000>RouteName:aaaa,distance: 2.000000,dailyRepeat: 3>PointName:ee,X: 22.000000,Y: 55.000000>PointName:rrrr,X: 33.000000,Y: 55.000000
+>RouteName:routeeee,distance: 33.000000,dailyRepeat: 3>PointName:vv,X: 33.000000,Y: 44.000000>RouteName:aaaa,distance: 2.000000,dailyRepeat: 3>PointName:ee,X: 22.000000,Y: 55.000000>PointName:rrrr,X: 33.000000,Y: 55.000000
+>RouteName:aaaa,distance: 2.000000,dailyRepeat: 3>PointName:ee,X: 22.000000,Y: 55.000000>PointName:rrrr,X: 33.000000,Y: 55.000000
